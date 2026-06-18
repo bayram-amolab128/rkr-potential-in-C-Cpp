@@ -1,0 +1,33 @@
+name = K2
+state = A1Sigma_u+
+kaiser = 0
+intmethod = spline
+Vmax = 10
+space = 0.001
+ladderspace = 0
+errortol = 0
+m1 = 39.0983
+m2 = 39.0983
+netcharge = 0
+
+we = 69.09
+xwe = 0.153
+ywe = 0
+zwe = 0
+_1we = 0
+_2we = 0
+_3we = 0
+_4we = 0
+_5we = 0
+_6we = 0
+
+Be = 0
+ae = 0
+ye = 0
+_1e = 0
+_2e = 0
+
+Te = 11681.9
+De = 0
+Ke = 0
+re = 0

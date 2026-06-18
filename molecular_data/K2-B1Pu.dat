@@ -1,0 +1,33 @@
+name = K2
+state = B1Pi_u
+kaiser = 0
+intmethod = spline
+Vmax = 0
+space = 0
+ladderspace = 0
+errortol = 0
+m1 = 39.0983
+m2 = 39.0983
+netcharge = 0
+
+we = 75.00
+xwe = 0.3876
+ywe = 0.004366
+zwe = 0
+_1we = 0
+_2we = 0
+_3we = 0
+_4we = 0
+_5we = 0
+_6we = 0
+
+Be = 0.048763
+ae = 0.00024
+ye = 0
+_1e = 0
+_2e = 0
+
+Te = 15376.7
+De = 8.25e-8
+Ke = 4.2125
+re = 0
