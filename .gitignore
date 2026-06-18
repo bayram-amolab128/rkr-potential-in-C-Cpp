@@ -3,6 +3,11 @@
 *.dat
 *.out
 
+# Exception: track files in molecular_data/
+!molecular_data/
+!molecular_data/**/*.txt
+!molecular_data/**/*.dat
+
 # IDE and editor files
 .vscode/
 .idea/
@@ -14,6 +19,8 @@
 
 # CMake
 
+#executable
+*.exe
 
 # Backup files
 *.bak
