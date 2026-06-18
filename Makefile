@@ -35,9 +35,9 @@ ifeq ($(FULLY_STATIC_EXE),1)
   BASE_STATIC_FLAGS := -static -static-libstdc++ -static-libgcc
 endif
 
-# Libraries
+# Libraries (NOW WITH STATIC GSL)
 LDLIBS := $(WX_LIBS) \
-          -Wl,--start-group -L$(GSL_LIB) -lgsl -lgslcblas -lm -Wl,--end-group \
+          -Wl,--start-group -Wl,-Bstatic -L$(GSL_LIB) -lgsl -lgslcblas -Wl,-Bdynamic -lm -Wl,--end-group \
           -fopenmp
 
 ifeq ($(STATIC_WINPTHREAD),1)
