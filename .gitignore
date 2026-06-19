@@ -9,6 +9,7 @@
 !molecular_data/
 !molecular_data/**/*.txt
 !molecular_data/**/*.dat
+!RKR_v*.exe
 
 # IDE and editor files
 .vscode/
