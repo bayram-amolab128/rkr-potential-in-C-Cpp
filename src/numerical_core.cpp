@@ -21,6 +21,8 @@
 #include <array>
 #include <cstdio>
 
+#include <filesystem>
+
 
 //Adding the not-a-knot cspline c++ impl using eigen library.
 
@@ -209,7 +211,10 @@ void calc(std::vector<double> &E, std::vector<double>& r,
        // if (std::abs(denom) < 1e-24) { //printf("The faulty return\n");A = 0.0; B = E1; return; }
         A = (E1 - E2) / denom;
         B = E2 - A / std::pow(d2,n);
-        //printf("The estimated A and B are %f and %f", A, B);
+        
+        printf("\n\nInward curvature is detected at v = %f\n", v_detect);
+        printf("The estimated n is %f\n", n);
+        printf("The estimated A and B are %f and %f\n\n", A, B);
         // Example MATLAB vs C++:
         // 669782.9284 and -388.461  (MATLAB)
         // 675222      and -446.016  (old C++)
@@ -228,6 +233,7 @@ void calc(std::vector<double> &E, std::vector<double>& r,
     //r1_s.reserve(1000000); r2_s.reserve(1000000); f_s.reserve(1000000);
 
     bool inwardDetected = false;
+    bool outwardDetected = true; // we assume outward curvature is always detected at the beginning, which is usually the case for typical diatomic potentials.
     double v_detect = vmin;
     //printf("\nThe v-minimum and v-maximum are: %f and %f\n", vmin, vmax);
     double r_detect = 0.0;
@@ -310,24 +316,27 @@ void calc(std::vector<double> &E, std::vector<double>& r,
         std::vector<double> E_axis = G_s;
         E_axis.insert(E_axis.end(), E_axis.begin(), E_axis.end()); // duplicate to match two branches
 
-        E.insert(E.end(), E_axis.begin(), E_axis.end());
-        r.insert(r.end(), r_axis.begin(), r_axis.end());
+        //E.insert(E.end(), E_axis.begin(), E_axis.end());
+        //r.insert(r.end(), r_axis.begin(), r_axis.end());
 
 
 
         //save in file for further analysis
         printf("The file is being generated....\n");
-        WriteRGToFile("Evsr_complete.dat",r, E );
-        printf("The file generation is complete, Evsr_complete.dat\n");
+        try {
+            std::filesystem::create_directories("./output");
+            } catch (const std::exception& e) {
+            std::cerr << "Failed to create output folder: " << e.what() << "\n";
+        }
+        WriteRGToFile("./output/Evsr_rawRKR.dat",r_axis, E_axis );
+        printf("The file generation is complete, ./output/Evsr_rawRKR.dat\n");
 
-        return;
     }
 
     // 1) Build turningPoints-like arrays exactly
     std::vector<double> r_axis;
     std::vector<double> E_axis;
-    //r_axis.reserve(2 * r1_s.size());
-    //E_axis.reserve(2 * r1_s.size());
+
 
     for (std::size_t i = 0; i < r1_s.size(); ++i) {
         r_axis.push_back(r1_s[i]);   // r1(v)
@@ -339,10 +348,7 @@ void calc(std::vector<double> &E, std::vector<double>& r,
 
     // 2) Sort by r (like [turningPointsOrdered, I] = sort(turningPoints))
     SortPaired(E_axis, r_axis);
-    gsl_interp_accel* acc_d   = gsl_interp_accel_alloc();
-    gsl_spline* spl_d         = gsl_spline_alloc(gsl_interp_steffen, r_axis.size());
-    gsl_spline_init(spl_d, r_axis.data(), E_axis.data(), r_axis.size());
-
+    
 
     std::vector<double> V_vals, dV_vals, d2V_vals;
     //spline_eval_cpp(r_spline, E_spline, distanceDomain, V_vals, dV_vals, d2V_vals);
@@ -355,18 +361,13 @@ void calc(std::vector<double> &E, std::vector<double>& r,
     std::vector<double> r_spl_branch;
     std::vector<double> E_spl_branch;
     
-    //std::reverse(r1_branch.begin(), r1_branch.end());
-    //std::reverse(E1_branch.begin(), E1_branch.end());
-    
-    //keeps r stictly monotonic.
-    //SortPaired(E1_branch, r1_branch);
 
 
 
     SplineNaK::Spline s;
     s.setPoints(r_branch, E_branch);
     
-    int NN=500000;
+    int NN=10000;
     //domain
     //double xx = *std::min_element(std::begin(r1_branch), std::end(r1_branch));
     //xx = xx;
@@ -391,7 +392,7 @@ void calc(std::vector<double> &E, std::vector<double>& r,
 
     //printf("The minimum and max of r1_branch: %f %f\n", xx_rmin, xx_rmax);
 
-    double dx = 1e-5;      // like distanceDomain step in MATLAB
+    double dx = 1e-4;      // like distanceDomain step in MATLAB
     
 
     //find different point for xx_rmax;
@@ -408,13 +409,17 @@ void calc(std::vector<double> &E, std::vector<double>& r,
         E_spl_branch.push_back(s(xx));
     }
 
+    try {
+        std::filesystem::create_directories("./output");
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to create output folder: " << e.what() << "\n";
+    }
 
-    WriteRGToFile("inner_wall_before_spline.dat", r_branch, E_branch);
-    WriteRGToFile("inner_wall_after_spline.dat", r_spl_branch, E_spl_branch);
+    WriteRGToFile("./output/inner_wall_before_spline.dat", r_branch, E_branch);
+    WriteRGToFile("./output/inner_wall_after_spline.dat", r_spl_branch, E_spl_branch);
 
 
-    //now we have a segmented spline.
-
+    //-------------------------------------------------/
     //lets estimate derivatives, first and second at few points back from the tail.
     if (r_spl_branch.size() < 4)
         throw std::runtime_error("r1_branch must have at least 4 elements");
@@ -426,21 +431,7 @@ void calc(std::vector<double> &E, std::vector<double>& r,
 
     double dV   = s.deriv(r_eval);
     double d2V = s.deriv2(r_eval);
-
-    // Now power estimate.
-    // Given: rEval, Vp (= dV/dr), Vpp (= d2V/dr2).
-
-    double n_estimate_rounded = 12.0;  // default fallback
-
-    if (std::isfinite(r_eval) && std::isfinite(dV) && std::isfinite(d2V) && std::abs(dV) >= 1e-14) {
-        double n_estimate = -(d2V / dV) * r_eval - 1.0;
-
-        if (std::isfinite(n_estimate)) {
-            n_estimate_rounded = std::round(n_estimate);
-
-            //printf("The n estimate rounded power for inner wall is: %f . dV = %f. d2V= %f\n. r_eval = %f at %d\n", n_estimate_rounded, dV, d2V, r_eval, dummy_idx);
-        }
-    }
+    //-------------------------------------------------/
 
 
     double n_sum = 0.0;
@@ -487,33 +478,173 @@ void calc(std::vector<double> &E, std::vector<double>& r,
         n_sum += n_i;
         ++n_cnt;
 
-        ////printf("idx = %d, n_i = %f  (r=%f, dV=%f, d2V=%f)\n", k, n_i, r_eval, dV, d2V);
     }
 
-    // fallback if nothing valid
-    n_estimate_rounded = 12.0;
-
-    if (n_cnt > 0) {
-        double n_avg = n_sum / static_cast<double>(n_cnt);
-        n_estimate_rounded = std::round(n_avg);
-    }
-
-    //printf("Averaged inner-wall power n = %f (from %d points)\n", n_estimate_rounded, n_cnt);
-
-
-    //std:://printf("power n = %f (r=%g, V'=%g, V''=%g)\n", n_rounded_e, rEval, Vp, Vpp);
-
-    //###################################################################
-
+    printf("\nThe estimated n for the tail is %f\n", n_sum / n_cnt);
     double dr = 0.0001;      // like distanceDomain step in MATLAB
     
     std::vector<double> r_spline, E_spline;
 
-    CubicSplineFit(r_axis, E_axis, dr, r_spline, E_spline);
-    //NotAKnotSplineFit(r_axis, E_axis, dr, r_spline, E_spline);
+    //now detect outward curvature
+    // After spline is created, detect negative concavity (if no inward curvature was detected)
+        double firstNegativeConcavityDistance = 0.0;
+        double negativeConcavityVibLevel = -0.5;
+        bool negativeConcavityVibLevel_vdetect = false;
+
+        if (!inwardDetected) {
+            printf("\nDebug point1\n");
+        
+            std::vector<double> preBottomNegativeConcavityDistances;
+        
+            // MATLAB:
+            // for p = 1:length(distanceDomain)-1
+            //     if dV(p) < 0 && dV(p+1) > 0
+            //         wellBottomIndex = [p p+1];
+            //         break
+            //     end
+            // end
+        
+            std::vector<size_t> wellBottomIndex;
+            bool foundWellBottom = false;
+        
+            for (size_t p = 0; p + 1 < r_spl_branch.size(); ++p) {
+                double dV_p  = s.deriv(r_spl_branch[p]);       // first derivative spline
+                double dV_p1 = s.deriv(r_spl_branch[p + 1]);
+            
+                if (dV_p < 0.0 && dV_p1 > 0.0) {
+                    wellBottomIndex.push_back(p);
+                    wellBottomIndex.push_back(p + 1);
+                    foundWellBottom = true;
+                    break;
+                }
+            }
+
+            printf(wellBottomIndex.size() > 1 ? "\nWell bottom detected at indices: %zu and %zu\n" : "\nNo well bottom detected using derivative sign change.\n",
+                   wellBottomIndex.size() > 1 ? wellBottomIndex[0] : 0,
+                   wellBottomIndex.size() > 1 ? wellBottomIndex[1] : 0);
 
 
-    WriteRGToFile("Evsr_data_cpp_spline.dat", r_spline, E_spline);
+                // MATLAB:
+    // [wellMinimum, indexOfWellMinimum] = mink(abs(V), 2);
+
+    std::vector<std::pair<double, size_t>> absV_with_index;
+
+    for (size_t i = 0; i < r_spl_branch.size(); ++i) {
+        double Vval = s(r_spl_branch[i]);
+        absV_with_index.push_back({std::abs(Vval), i});
+    }
+
+    std::sort(absV_with_index.begin(), absV_with_index.end(),
+              [](const auto& a, const auto& b) {
+                  return a.first < b.first;
+              });
+
+    std::vector<double> wellMinimum;
+    std::vector<size_t> indexOfWellMinimum;
+
+    size_t k = std::min<size_t>(2, absV_with_index.size());
+
+    for (size_t i = 0; i < k; ++i) {
+        wellMinimum.push_back(absV_with_index[i].first);
+        indexOfWellMinimum.push_back(absV_with_index[i].second);
+    }
+
+    printf("\nTwo smallest abs(V) values:\n");
+    for (size_t i = 0; i < wellMinimum.size(); ++i) {
+        printf("abs(V) = %.15e at index = %zu, r = %.15f\n",
+               wellMinimum[i],
+               indexOfWellMinimum[i],
+               r_spl_branch[indexOfWellMinimum[i]]);
+    }
+        
+    if (!inwardDetected)
+{
+    // MATLAB wellBottomIndex(2)
+size_t wellBottomIdx2;
+
+if (wellBottomIndex.size() > 1) {
+    wellBottomIdx2 = wellBottomIndex[1];
+}
+else {
+    printf("\nWarning: derivative well bottom not found. Using mink(abs(V),2) index instead.\n");
+
+    if (!indexOfWellMinimum.empty()) {
+        wellBottomIdx2 = indexOfWellMinimum[0];
+    }
+    else {
+        printf("\nError: no well bottom index available. Skipping concavity detection.\n");
+        return;
+    }
+}
+
+double wellBottomDistance = r_spl_branch[wellBottomIdx2];
+printf("\nWell bottom distance used for concavity check: %f\n", wellBottomDistance);
+
+std::vector<double> d2V1, d2V2, r_subset;
+    for (size_t l = 0; l < r_spl_branch.size();l++)
+    {
+        double d2V_l  = s.deriv2(r_spl_branch[l]);
+        double d2V_l1 = s.deriv2(r_spl_branch[l + 1]);
+
+        
+        if(r_spl_branch[l] < wellBottomDistance){
+        //printf("\n%f %f %f", r_spl_branch[l], d2V_l, d2V_l1);
+        d2V1.push_back(d2V_l);
+        d2V2.push_back(d2V_l1);
+        r_subset.push_back(r_spl_branch[l]);
+         if(d2V_l > 0.0 &&
+           d2V_l1 < 0.0) {
+            printf("\nNegative concavity detected at r = %f, before well bottom at %f\n", r_spl_branch[l], wellBottomDistance);
+            preBottomNegativeConcavityDistances.push_back(r_spl_branch[l]);
+            break;
+        }
+        }
+    
+    }
+
+    WriteColumnsToFile("./output/concavity_check.dat",r_subset, d2V1, d2V2);
+}
+
+
+
+
+        // Use the last (closest to well) negative concavity distance found
+        if (!preBottomNegativeConcavityDistances.empty()) {
+            firstNegativeConcavityDistance = preBottomNegativeConcavityDistances.back();
+                printf("\n Debug point3\n");
+            // Convert distance to vibrational level for smoothing
+            // Find closest index in r_branch to this distance
+            auto it = std::min_element(r_branch.begin(), r_branch.end(),
+                [&](double a, double b) {
+                    return std::abs(a - firstNegativeConcavityDistance) < 
+                           std::abs(b - firstNegativeConcavityDistance);
+                });
+            size_t indexInTurningPointList = std::distance(r_branch.begin(), it);
+
+
+            if (negativeConcavityVibLevel == -0.5) {
+                negativeConcavityVibLevel =
+                std::floor(p.ex.Vmax - (indexInTurningPointList+1) * space);
+
+                std::cout
+                << "space: "
+                << space
+                << "indexInTurningPointList: "
+                << indexInTurningPointList
+                << "Negative concavity located near v = "
+                << negativeConcavityVibLevel
+                << ", proceeding to smooth. This may take a long time."
+                << std::endl;
+            }
+            
+                printf("\n Debug point3\n");
+            printf("Negative concavity detected at r = %f, near v ~ %d\n", 
+                   firstNegativeConcavityDistance, negativeConcavityVibLevel);
+            negativeConcavityVibLevel_vdetect = true;
+        }
+    }
+
+    printf("\n Debug point\n");
 
     // --- PASS 2: rebuild tail with inverse-power inner wall ---
 
@@ -521,17 +652,18 @@ void calc(std::vector<double> &E, std::vector<double>& r,
 
     // Convert negative concavity v-level (v_detect) into a vibrational index
     int vibIndex_nc = static_cast<int>(std::round((v_detect - vmin) / space));
+
+    if (negativeConcavityVibLevel_vdetect) {
+        vibIndex_nc = negativeConcavityVibLevel;
+        printf("\nNegative concavity vibrational index for smoothing: %d\n", vibIndex_nc);
+        v_detect =vibIndex_nc;
+    }
+
     if (vibIndex_nc < 0) vibIndex_nc = 0;
     if (vibIndex_nc >= static_cast<int>(r1_s.size()))
         vibIndex_nc = static_cast<int>(r1_s.size()) - 1;
 
-    //printf("The vibrational quantum number detected: %f\n", vibIndex_nc);
 
-    
-    RGWriter writer("first_derivatives.txt");
-    RGWriter writer2("first_derivatives_feed-insE.dat");
-    RGWriter writer3("first_derivatives_feed-insr.dat");
-    // New estimatePowerN: use MATLAB spline derivatives at r1_s via dV_vals/d2V_vals
     auto estimatePowerN = [&](const std::vector<double>& r1_levels,
                           int vibIndex_nc_local) -> double
 {
@@ -545,11 +677,12 @@ void calc(std::vector<double> &E, std::vector<double>& r,
     // Our vibIndex_nc_local is 0-based → add 1 to mimic MATLAB index.
     int nc_mat = vibIndex_nc_local + 1;   // 1-based equivalent
 
-    
+    printf("\n vdetect for inward curvature is %f", v_detect);
     int iStart_mat = static_cast<int>(std::floor(0.5 * v_detect));
     int iEnd_mat   = static_cast<int>(std::floor(0.9 * v_detect));
 
-    //printf("The start and end vib index are %d and %d at %f\n", iStart_mat, iEnd_mat, v_detect);
+
+    printf("\nThe start and end vib index are %d and %d at %f\n", iStart_mat, iEnd_mat, v_detect);
 
     // MATLAB indices are at least 1
     //if (iStart_mat < 1) iStart_mat = 1;
@@ -593,9 +726,9 @@ void calc(std::vector<double> &E, std::vector<double>& r,
         double Vp   = s.deriv(rEval);
         double Vpp = s.deriv2(rEval);
 
-        //printf("Vp and Vpp at %d at %f are %f and %f\n", i,rEval, Vp, Vpp);
+        printf("Vp and Vpp at inner r = %f are %f and %f\n", rEval, Vp, Vpp);
 
-        writer.writeValue(Vp);
+        //writer.writeValue(Vp);
 
         if (!std::isfinite(Vp) || !std::isfinite(Vpp) || std::abs(Vp) < 1e-14){
             //printf("This is where it breaks!!!!\n");
@@ -610,7 +743,7 @@ void calc(std::vector<double> &E, std::vector<double>& r,
     }
 
     if (cnt == 0) {
-        std::cout << "This2\n";
+        std::cout << "Default n value used (n=12.0)\n";
         return 12.0;
     }
 
@@ -635,11 +768,11 @@ void calc(std::vector<double> &E, std::vector<double>& r,
 
     vibIndex_nc = std::clamp(vibIndex_nc, 0, (int)r1_s.size() - 1);
 
-    // Compute smoothing indices from MATLAB rule: floor(0.85 * v_n)
+    // Compute smoothing indices from MATLAB rule: floor(0.65 * v_n)
 
 
 
-    int i2_vib = static_cast<int>(std::floor(0.85 * vibIndex_nc));
+    int i2_vib = static_cast<int>(std::floor(0.65 * vibIndex_nc));
     int i1_vib = i2_vib - 1;
 
     i1_vib = std::clamp(i1_vib, 0, (int)r1_s.size() - 1);
@@ -655,11 +788,11 @@ void calc(std::vector<double> &E, std::vector<double>& r,
     // Fit A and B exactly like MATLAB
     double A = 0.0, B = 1.0;
 
-    const double d1 = calculate_r1_n(std::floor(v_detect*0.85)-1.0);
-    const double d2 = calculate_r1_n(std::floor(v_detect*0.85));
+    const double d1 = calculate_r1_n(std::floor(v_detect*0.65)-1.0);
+    const double d2 = calculate_r1_n(std::floor(v_detect*0.65));
 
-    const double E1 =  calculate_G_n(std::floor(v_detect*0.85)-1.0);
-    const double E2 =  calculate_G_n(std::floor(v_detect*0.85));
+    const double E1 =  calculate_G_n(std::floor(v_detect*0.65)-1.0);
+    const double E2 =  calculate_G_n(std::floor(v_detect*0.65));
 
     fitAB(n, d1, d2, E1, E2, A, B, v_detect);
     //printf("\n %e and %e\n", A, B);
@@ -752,15 +885,6 @@ void calc(std::vector<double> &E, std::vector<double>& r,
 
     E.insert(E.end(), E_axis_all.begin(), E_axis_all.end());
     r.insert(r.end(), r_axis_all.begin(), r_axis_all.end());
-
-
-    //save in file for further analysis
-    printf("The file is being generated....\n");
-    WriteRGToFile("Evsr_complete.dat",r, E );
-    printf("The file generation is complete, Evsr_complete.dat\n");
-
-    gsl_spline_free(spl_d);
-    gsl_interp_accel_free(acc_d);
 
 
 }
@@ -878,69 +1002,6 @@ void SortPaired(std::vector<double>& E, std::vector<double>& r)
 
 //################################################################//
 //################################################################//
-
-
-// Build a cubic spline E(r) and evaluate on a fine grid.
-void CubicSplineFit(const std::vector<double>& r_in,
-                    const std::vector<double>& E_in,
-                    double dr,
-                    std::vector<double>& r_out,
-                    std::vector<double>& E_out)
-{
-    if (r_in.size() != E_in.size()) {
-        throw std::runtime_error("CubicSplineFit: r_in and E_in must have the same size.");
-    }
-    if (r_in.size() < 2) {
-        throw std::runtime_error("CubicSplineFit: need at least 2 points for spline.");
-    }
-    if (dr <= 0.0) {
-        throw std::runtime_error("CubicSplineFit: dr must be positive.");
-    }
-
-    for (std::size_t i = 1; i < r_in.size(); ++i) {
-        if (r_in[i] <= r_in[i-1]) {
-            throw std::runtime_error("CubicSplineFit: r_in must be strictly increasing.");
-        }
-    }
-
-    std::size_t n = r_in.size();
-
-    gsl_interp_accel* acc   = gsl_interp_accel_alloc();
-    //gsl_spline* spline      = gsl_spline_alloc(gsl_interp_cspline, n);
-    
-    const gsl_interp_type* T = (n < gsl_interp_steffen->min_size)
-                         ? gsl_interp_linear
-                         : gsl_interp_steffen;
-
-    gsl_spline* spline = gsl_spline_alloc(T, n);
-
-
-    gsl_spline_init(spline, r_in.data(), E_in.data(), n);
-
-    double rmin = r_in.front();
-    double rmax = r_in.back();
-
-    std::size_t Nout = static_cast<std::size_t>((rmax - rmin)/dr) + 1;
-
-    r_out.clear();
-    E_out.clear();
-    r_out.reserve(Nout);
-    E_out.reserve(Nout);
-
-    for (std::size_t i = 0; i < Nout; ++i) {
-        double r = rmin + i * dr;
-        if (r > rmax) r = rmax;
-
-        double E = gsl_spline_eval(spline, r, acc);
-
-        r_out.push_back(r);
-        E_out.push_back(E);
-    }
-
-    gsl_spline_free(spline);
-    gsl_interp_accel_free(acc);
-}
-
 
 void LinearResample(const std::vector<double>& r_in,
                     const std::vector<double>& E_in,

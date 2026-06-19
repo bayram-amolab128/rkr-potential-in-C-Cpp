@@ -9,7 +9,7 @@
 #include <vector>
 #include <algorithm>
 #include <gsl/gsl_integration.h>
-#include "gui_parameters.h"
+//#include "gui_parameters.h"
 
 class rkr_procedure {
 private:

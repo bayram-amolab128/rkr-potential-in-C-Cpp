@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <filesystem>
 #include "numerical_core.hpp"       // <-- has MorseParams + morse helpers declared
 
 #include "global_vars.h"
@@ -468,25 +469,25 @@ public:
         auto* gvBox = new wxStaticBox(panel, wxID_ANY, wxString::FromUTF8("G(v) parameters (in cm⁻¹)"));
         auto* gvSizer = new wxStaticBoxSizer(gvBox, wxVERTICAL);
         auto* gvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑ "),      gv.we,    351.43,    0.01, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑ "),      gv.we,    351.43,    0.01, 18,
                  wxString::FromUTF8("Fundamental vibration constant ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑxₑ "),   gv.xwe,   2.61,      0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑxₑ "),   gv.xwe,   2.61,      0.001, 18,
                  wxString::FromUTF8("First anharmonicity constant xₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑyₑ "),   gv.ywe,   0.00295,   0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑyₑ "),   gv.ywe,   0.00295,   0.001, 18,
                  wxString::FromUTF8("Second anharmonicity constant yₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑzₑ "),   gv.zwe,   0.0,       0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑzₑ "),   gv.zwe,   0.0,       0.001, 18,
                  wxString::FromUTF8("Third anharmonicity constant zₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑaₑ "),   gv.awe,   0.0,       0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑaₑ "),   gv.awe,   0.0,       0.001, 18,
                  wxString::FromUTF8("Higher-order Dunham coefficient aₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑbₑ "),   gv.bwe,   0.0,       0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑbₑ "),   gv.bwe,   0.0,       0.001, 18,
                  wxString::FromUTF8("Higher-order Dunham coefficient bₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑcₑ "),   gv.cwe,   0.0,       0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑcₑ "),   gv.cwe,   0.0,       0.001, 18,
                  wxString::FromUTF8("Higher-order Dunham coefficient cₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑdₑ "),   gv.dwe,   0.0,       0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑdₑ "),   gv.dwe,   0.0,       0.001, 18,
                  wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑeₑ "),   gv.ewe,   0.0,       0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑeₑ "),   gv.ewe,   0.0,       0.001, 18,
                  wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑfₑ "),   gv.fwe,   0.0,       0.001, 8,
+        addField(gvGrid, panel, wxString::FromUTF8("ωₑfₑ "),   gv.fwe,   0.0,       0.001, 18,
                  wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."));
         gvGrid->AddGrowableCol(1, 1);
         gvSizer->Add(gvGrid, 0, wxEXPAND | wxALL, 8);
@@ -495,15 +496,15 @@ public:
         auto* bvBox = new wxStaticBox(panel, wxID_ANY, wxString::FromUTF8("B(v) parameters (in cm⁻¹)"));
         auto* bvSizer = new wxStaticBoxSizer(bvBox, wxVERTICAL);
         auto* bvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
-        addField(bvGrid, panel, wxString::FromUTF8("Bₑ "),   bv.Be,  0.67264,  0.001, 8,
+        addField(bvGrid, panel, wxString::FromUTF8("Bₑ "),   bv.Be,  0.67264,  0.001, 18,
                  wxString::FromUTF8("Equilibrium rotational constant Bₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("αₑ "),   bv.ae,  0.00704,  0.001, 8,
+        addField(bvGrid, panel, wxString::FromUTF8("αₑ "),   bv.ae,  0.00704,  0.001, 18,
                  wxString::FromUTF8("Vibration-rotation interaction constant αₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("γₑ "),   bv.ye, -0.00004,  0.00001, 8,
+        addField(bvGrid, panel, wxString::FromUTF8("γₑ "),   bv.ye, -0.00004,  0.00001, 18,
                  wxString::FromUTF8("Dunham rotational coefficient γₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("γ₁ₑ "),  bv._1e, 0.0,      0.001, 8,
+        addField(bvGrid, panel, wxString::FromUTF8("γ₁ₑ "),  bv._1e, 0.0,      0.001, 18,
                  wxString::FromUTF8("First higher-order rotational coefficient γ₁ₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("γ₂ₑ "),  bv._2e, 0.0,      0.001, 8,
+        addField(bvGrid, panel, wxString::FromUTF8("γ₂ₑ "),  bv._2e, 0.0,      0.001, 18,
                  wxString::FromUTF8("Second higher-order rotational coefficient γ₂ₑ."));
         bvGrid->AddGrowableCol(1, 1);
         bvSizer->Add(bvGrid, 0, wxEXPAND | wxALL, 8);
@@ -708,6 +709,13 @@ private:
     
 
     void OnRun(wxCommandEvent&) {
+
+        //create output file
+        try {
+            std::filesystem::create_directories("./output");
+        } catch (const std::exception& e) {
+            output->AppendText(wxString::Format("Failed to create output folder: %s\n", e.what()));
+        }
         AllParams p;
         //p.name = std::string()
         p.state_name = std::string(titleCtrl->GetValue().mb_str());
@@ -758,10 +766,16 @@ private:
         printf("=============\n"); 
         printf(p.state_name.c_str());
         printf("=============\n"); 
-        WriteRGToFile("Evsr.dat",r, E );
+
+        try {
+            std::filesystem::create_directories("./output");
+        } catch (const std::exception& e) {
+            output->AppendText(wxString::Format("Failed to create output folder: %s\n", e.what()));
+        }
+        WriteRGToFile("./output/Evsr.dat",r, E );
         // Plot from external vectors
         plot->SetDataXY(r, E);
-        output->AppendText(wxString::Format("Plot is updated and Evsr data is saved in ./Evsr_complete.dat.\n"));
+        output->AppendText(wxString::Format("Plot is updated and Evsr data is saved in ./output/Evsr.dat.\n"));
 
         //auto [v_n, E_n] = calc_discrete(ve, p.ex.Vmax, p.ex.Te, dissociationEnergy_rel);
 
@@ -770,8 +784,8 @@ private:
            // output->AppendText(wxString::Format("v=%.1f  E=%.3f 1/cm\n", r_v[i], E_v[i]));
         //}
 
-        WriteRGToFile("Evsr_discrete_data_cpp.dat", r_v, E_v);
-        output->AppendText(wxString::Format("Evsr_discrete_data_cpp.dat output file is updated.\n"));
+        WriteRGToFile("./output/Evsr_discrete.dat", r_v, E_v);
+        output->AppendText(wxString::Format("Evsr_discrete.dat output file is updated with discrete energy levels.\n"));
 
     }
 

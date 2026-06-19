@@ -19,12 +19,12 @@ struct Parameters {
     double _xwe;
     double _ywe;
     double _zwe;
-    double _1we;
-    double _2we;
-    double _3we;
-    double _4we;
-    double _5we;
-    double _6we;
+    double _awe;
+    double _bwe;
+    double _cwe;
+    double _dwe;
+    double _ewe;
+    double _fwe;
     double Be;
     double ae;
     double _ye;

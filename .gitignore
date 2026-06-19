@@ -27,3 +27,6 @@
 # Backup files
 *.bak
 *.backup
+
+#test python scripts
+*.py
