@@ -1,6 +1,6 @@
-# Project Name
+# Rydberg-Klein-Reese (RKR) Potential Energy Curve Generator
 
-A C++ project for molecular spectroscopy and scientific computation.
+This is a C++ project for Rydberg-Klein-Reese (RKR) Procedure for point-wise diatomic molecular potential energy curves (PECs). The standalone executable shipped with this project **RKR_v1.exe** (compiled using msys/mingw64 build system, further information and installation guidelines can be found here: https://www.msys2.org/) offers fast, easy-to-use, and accessible (completely free) gui for inputing spectroscopic parameters/constants obtained from experimental data (laser-induced fluorescence spectra), computational backend generating the RKR PECs, plotting for immediate visualization, and saving the PEC data for further quantum mechanical applications, such as solving radial schrödinger equation
 
 ---
 
