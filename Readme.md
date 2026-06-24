@@ -117,6 +117,6 @@ make
 
 **Amar Dadel**, **Dr. Burcin Bayram**  
 dadela@miamioh.edu, bayramsb@miamioh.edu \
-Department of Physics  
-Miami University Oxford, Ohio, United States.
+Department of Physics, Miami University Oxford, Ohio \ 
+United States.
 
