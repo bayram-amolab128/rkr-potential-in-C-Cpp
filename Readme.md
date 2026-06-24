@@ -35,6 +35,7 @@ See the `LICENSE` file for details.
 ---
 
 ## Requirements
+### Build Environment (Windows)
 msys/mingw64 build system or similar C/C++ build environment.
 https://www.msys2.org/
 
