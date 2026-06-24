@@ -8,7 +8,7 @@ calculation parameters. It also visualizes the resulting potential energy curve 
 for quick verification and exports it to a plain-text format compatible with the LEVEL 8.0 program,
 enabling downstream calculations such as Franck-Condon factors for comparing the rovibrational
 peaks with the experimentally obtained spectra. The program is benchmarked against a proof-of-concept Matlab (MathWorks, Natick, MA) script developed by our group as well as the RKR script in the pre-existing
-Optimizer Matlab package developed by Sovkov \cite{optimizer_sovkov}. It shows significant improvement in compute-time while maintaining
+Optimizer Matlab package developed by Sovkov (https://sourceforge.net/projects/optimizer-sovkov/). It shows significant improvement in compute-time while maintaining
 the same double-precision (64-bit floating-point) numerical accuracy. Most importantly, the program
 is free-to-use under the GNU General Public License and is purely standalone. Therefore, it is
 accessible to universities and colleges without relying on proprietary software or requiring a
