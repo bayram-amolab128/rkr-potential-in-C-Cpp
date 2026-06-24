@@ -115,15 +115,8 @@ make
 
 ## Authors
 
-**Amar Dadel**  
-dadela@miamioh.edu, dadel.amar98@gmail.com
+**Amar Dadel**, **Dr. Burcin Bayram**  
+dadela@miamioh.edu, bayramsb@miamioh.edu \
 Department of Physics  
-Miami University
+Miami University Oxford, Ohio, United States.
 
-### Supervisor
-
-**Dr. Burcin Bayram**  
-Laser Spectroscopy Laboratory  Room No. 128
-bayramsb@miamioh.edu
-Department of Physics  
-Miami University
