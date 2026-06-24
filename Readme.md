@@ -22,7 +22,7 @@ This is a C++ project for Rydberg-Klein-Reese (RKR) Procedure for point-wise dia
 
 ## License
 
-This project is licensed under the **GNU General Public License v3.0**.  
+This project is licensed under the **GNU General Public License v3.0 or later**.  
 See the `LICENSE` file for details.
 
 ### Third-Party Dependencies
@@ -35,6 +35,9 @@ See the `LICENSE` file for details.
 ---
 
 ## Requirements
+msys/mingw64 build system or similar C/C++ build environment.
+https://www.msys2.org/
+
 
 ### GUI (Windows)
 
