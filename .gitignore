@@ -2,8 +2,6 @@
 *.txt
 *.dat
 *.out
-*.png
-*.jpg
 
 # Exception: track files in molecular_data/
 !molecular_data/
