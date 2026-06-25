@@ -1,3 +1,23 @@
+/*
+Amar Dadel, Dr. Burcin Bayram  
+dadela@miamioh.edu, bayramsb@miamioh.edu
+Department of Physics, Miami University Oxford
+Ohio 45046, United States.
+
+==============================================
+This code performs all the necssary numerical calculations 
+for the RKR:
+1. 
+
+
+
+
+*/
+
+
+
+
+
 #include "numerical_core.hpp"
 #include <sstream>
 #include <iomanip>
@@ -1111,6 +1131,40 @@ void makeMorseOnGrid(const MorseParams& m,
     for (std::size_t i = 0; i < r_in.size(); ++i)
         V_out[i] = morseV(r_in[i], m);
 }
+
+
+//Function definitions of Outer wall dissociation limit methods.
+void DissociationTail(int option_code, std::vector<double> &V, std::) {
+    if(option_code ==1){
+        
+    
+    
+    }
+    elsif(option_code==2){
+
+
+    }
+
+    elsif(option_code==3){
+
+
+
+
+    }
+    elsif(option_code==4){
+
+
+
+    }
+
+
+
+}   
+
+
+
+
+
 
 
 // Writes paired arrays (r, G) to a text file.

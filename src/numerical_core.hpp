@@ -74,6 +74,14 @@ void WriteRGToFile(const std::string& filename,
                    const std::vector<double>& r,
                    const std::vector<double>& G);
 
+                   
+//------------------------------------------------------------------------------/
+void DissociationTail(int option_code);   //can be 1, 2, 3, or 4 for RKR(Default), Morse, LongRange, and Morse+LR 
+void MorseTail(double De, Double re, Double ke);
+void LongRangeTail(double C6, double C8, double C10);
+void MLRTail(double De, Double re, Double ke, double C6, double C8, double C10); //Morse + LongRange by LeRoy.
+//------------------------------------------------------------------------------/
+
 
                    
 // Template helper implementation
