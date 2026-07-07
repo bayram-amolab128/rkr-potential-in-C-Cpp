@@ -63,6 +63,23 @@ struct AllParams {
     switch_params sw;
 };
 
+struct MorseParams {
+    double Te;   // electronic term origin (cm⁻¹)
+    double De;   // dissociation energy (cm⁻¹)
+    double Re;   // equilibrium bond length (Å)
+    double ke;   // force constant (cm⁻¹ / Å²)
+
+    // compute shape parameter a = √(Ke / (2 De))
+    double a() const;
+};
+
+//for morse potential
+inline double MorseParams::a() const {
+    if (De > 0.0 && ke > 0.0)
+        return std::sqrt(ke / (2.0 * De));
+    return 0.0;
+}
+
 //file reader to collect spectroscopic constants.
 inline std::string trim(std::string s)
 {

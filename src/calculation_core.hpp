@@ -105,6 +105,12 @@ void combine_inner_outer_rkr(std::vector<double> &V_inner, std::vector<double>& 
                              std::vector<double> &V, std::vector<double>& r, 
                              const CalcParam &cp);
 
+//added morse curve generators.
+double morseV(double r, const MorseParams& m);
+void makeMorseCurve(const MorseParams& m,
+                    double rmin, double rmax, double dr,
+                    std::vector<double>& r_out,
+                    std::vector<double>& V_out);
 
 
 std::ostream& operator<<(std::ostream& os, const CalcParam& p);

@@ -581,6 +581,36 @@ void combine_inner_outer_rkr(std::vector<double>& V_inner, std::vector<double>& 
     WriteRGToFile("./output/totalPEC.dat", r, V);
 }
 
+
+//===morse curve for overlay.. not yet complete.
+double morseV(double r, const MorseParams& m) {
+    const double a = m.a();
+    const double e = std::exp(-a * (r - m.Re));
+    return m.Te + m.De * (1.0 - e) * (1.0 - e);
+}
+
+void makeMorseCurve(const MorseParams& m,
+                    double rmin, double rmax, double dr,
+                    std::vector<double>& r_out,
+                    std::vector<double>& V_out)
+{
+    r_out.clear();
+    V_out.clear();
+    if (dr <= 0.0 || rmax <= rmin) return;
+
+    std::size_t N = static_cast<std::size_t>((rmax - rmin) / dr) + 1;
+    r_out.reserve(N);
+    V_out.reserve(N);
+
+    double r = rmin;
+    for (std::size_t i = 0; i < N; ++i, r += dr) {
+        r_out.push_back(r);
+        V_out.push_back(morseV(r, m));
+    }
+}
+
+
+
 std::ostream& operator<<(std::ostream& os, const CalcParam& p)
 {
     os << std::fixed << std::setprecision(16);

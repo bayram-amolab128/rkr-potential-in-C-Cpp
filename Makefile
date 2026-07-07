@@ -2,10 +2,9 @@
 CXX := g++
 
 # Sources / headers / target
-SRCS := ./src/RKR_gui_top.cpp ./src/numerical_core.cpp
-HDRS := ./src/numerical_core.hpp ./src/SplineNaK.h ./src/SplineNaK2.h
+SRCS := ./src/RKR_gui_top.cpp ./src/calculation_core.cpp 
+HDRS := ./src/calculation_core.hpp  ./src/calc_wrapper.hpp ./src/SplineNaK.h ./src/SplineNaK2.h
 OUT  := RKR_v1.exe
-
 # wxWidgets (static)
 WX_CXXFLAGS := $(shell wx-config --static --cxxflags)
 WX_LIBS     := $(shell wx-config --static --libs)

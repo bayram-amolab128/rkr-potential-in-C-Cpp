@@ -9,14 +9,11 @@
 #include <sstream>
 #include <unordered_map>
 #include <filesystem>
-#include "numerical_core.hpp"       // <-- has MorseParams + morse helpers declared
+#include "helper.hpp"
+#include "calc_wrapper.hpp"
 
-#include "global_vars.h"
 
 #include <chrono>
-
-// declare your external calc (implemented elsewhere)
-extern void calc(std::vector<double>& E, std::vector<double>& r,std::vector<double>& E_v, std::vector<double>& r_v, const AllParams& p);
 
 // ---- External data (filled by your calc) ----
 std::vector<double> r;    // X values
@@ -24,6 +21,9 @@ std::vector<double> E;    // Y values
 
 std::vector<double> r_v;  // X values
 std::vector<double> E_v;  // Y values
+std::vector<double> v;    // discrete v values
+
+CalcParam cp;
 
 
 //molecular name and state.
@@ -717,6 +717,7 @@ private:
             output->AppendText(wxString::Format("Failed to create output folder: %s\n", e.what()));
         }
         AllParams p;
+        //CalcParam cp; --globally initialized.
         //p.name = std::string()
         p.state_name = std::string(titleCtrl->GetValue().mb_str());
     
@@ -725,12 +726,17 @@ private:
         p.gv.we  = val(gv.we);   p.gv.xwe = val(gv.xwe); p.gv.ywe = val(gv.ywe);
         p.gv.zwe = val(gv.zwe);  p.gv.awe = val(gv.awe); p.gv.bwe = val(gv.bwe);
         p.gv.cwe = val(gv.cwe);  p.gv.dwe = val(gv.dwe); p.gv.ewe = val(gv.ewe);
-        p.gv.fwe = val(gv.fwe);
+        p.gv.fwe = val(gv.fwe);  //p.gv.gwe = val(gv.gwe); p.gv.hwe = val(gv.hwe);
+        //p.gv.iwe = val(gv.iwe);  p.gv.jwe = val(gv.jwe); p.gv.kwe = val(gv.kwe); 
+        //p.gv.lwe = val(gv.lwe);
 
         // B(v) params
         p.bv.Be = val(bv.Be);      p.bv.ae = val(bv.ae);
         p.bv.ye = val(bv.ye);      p.bv._1e = val(bv._1e);
-        p.bv._2e  = val(bv._2e);
+        p.bv._2e  = val(bv._2e);   //p.bv._3e  = val(bv._3e);   p.bv._4e  = val(bv._4e);
+        //p.bv._5e  = val(bv._5e);   p.bv._6e  = val(bv._6e);   p.bv._7e  = val(bv._7e);
+        //p.bv._8e  = val(bv._8e);   p.bv._9e  = val(bv._9e);   p.bv._10e = val(bv._10e);
+        //p.bv._11e = val(bv._11e);  p.bv._12e = val(bv._12e);  p.bv._13e = val(bv._13e);
 
         // Extras
         p.ex.m1 = val(extras.m1);
@@ -751,10 +757,10 @@ private:
         r.clear(); E.clear();
 
         auto start = std::chrono::high_resolution_clock::now();
-        calc(E, r, E_v, r_v, p);   //calculates E and r values;
-        SortPaired(E, r);
- 
-        //LinearResample( r_clean, E_clean, dr, r_fit,E_fit);
+        
+
+        calc_wrapper(E, r, E_v, r_v, v, p, cp);   //calculates E and r values;
+        
 
         auto end   = std::chrono::high_resolution_clock::now();
 
@@ -941,11 +947,9 @@ private:
         return count;
     }
 
-
-    
     void print_in_disp(){
         //print out some calculated internal values.
-        output->AppendText(wxString::Format("Equillibrium point: %f\n", calculated_re));
+        output->AppendText(wxString::Format("Equillibrium Internuclear Distance: %f\n", cp.re));
     }
 };
 
