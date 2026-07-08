@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RKR Potential Generator</title>
+    <link rel="stylesheet" href="rkr_webapp.css">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <header class="app-header">
+        <div>
+            <h1>RKR Potential Generator</h1>
+            <p>Generate Rydberg-Klein-Rees (RKR) potential energy curve from spectroscopic constants.</p>
+        </div>
+    </header>
+
+    <main class="main-grid">
+
+        <section class="left-panel">
+
+            <div class="coeff-grid">
+
+                <div class="param-card">
+                    <h2>G(v) coefficients</h2>
+                    <div id="gvFields" class="field-grid"></div>
+                </div>
+
+                <div class="param-card">
+                    <h2>B(v) coefficients</h2>
+                    <div id="bvFields" class="field-grid"></div>
+                </div>
+
+            </div>
+
+            <div class="param-card general-card">
+                <h2>General / run parameters</h2>
+                <div id="generalFields" class="general-fields"></div>
+            </div>
+
+        </section>
+
+        <section class="right-panel">
+
+            <div class="plot-card" id="plotCard">
+                <h2>Potential Energy Curve</h2>
+                <div class="plot-wrapper">
+                    <div id="plot"></div>
+                
+                    <div id="loadingOverlay" class="loading-overlay hidden">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Calculating RKR...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="log-card">
+                <h2>Calculation log</h2>
+                <pre id="logBox">Console output will appear here...</pre>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="bottom-bar">
+
+        <input type="file" id="fileInput" accept=".txt,.dat">
+
+        <button id="loadButton">Load file</button>
+        <button id="generateButton">Generate RKR</button>
+        <button id="downloadButton">Download .dat</button>
+
+        <textarea id="inputText" style="display:none;"></textarea>
+
+    </footer>
+
+</div>
+
+<script src="rkr.js"></script>
+<script src="rkr_webapp.js"></script>
+
+</body>
+</html>
