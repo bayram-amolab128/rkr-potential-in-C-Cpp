@@ -34,7 +34,7 @@ html, body {
 .main-grid {
     min-height: 0;
     display: grid;
-    grid-template-columns: 48% 52%;
+    grid-template-columns: 40% 60%;
     gap: 10px;
     padding: 10px;
     box-sizing: border-box;
@@ -43,14 +43,15 @@ html, body {
 .left-panel {
     min-height: 0;
     display: grid;
-    grid-template-rows: 1fr 155px;
+    grid-template-rows: 3fr 2fr;
     gap: 10px;
 }
+
 
 .right-panel {
     min-height: 0;
     display: grid;
-    grid-template-rows: 1fr 150px;
+    grid-template-rows: 5fr 1fr;
     gap: 10px;
 }
 
@@ -110,14 +111,28 @@ html, body {
 }
 
 .general-card {
-    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .general-fields {
+    flex: 1;
+    overflow-y: auto;
+
     display: grid;
-    grid-template-columns: 58px 1fr 58px 1fr 72px 1fr 72px 1fr;
-    gap: 6px 8px;
+
+    /* Two parameter groups per row */
+    grid-template-columns:
+        max-content 1fr
+        max-content 1fr;
+
+    column-gap: 28px;
+    row-gap: 12px;
+
     align-items: center;
+
+    padding-right: 8px;
 }
 
 #plot {

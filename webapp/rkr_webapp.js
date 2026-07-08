@@ -47,16 +47,147 @@ const B_KEYS = [
 const GENERAL_KEYS = [
     "name","state","kaiser","intmethod",
     "Vmax","space","ladderspace","errortol",
-    "m1 (amu)","m2 (amu)","netcharge",
+    "m1","m2","netcharge",
     "Te","De","Ke","re"
 ];
+const LABELS = {
+
+    // -----------------------------
+    // General
+    // -----------------------------
+    name: "\\(Molecule\\)",
+    state: "\\(State\\)",
+
+    kaiser: "\\(Kaiser\\)",
+    intmethod: "\\(Method\\)",
+
+    Vmax: "\\(v_{\\max}\\;(cm^{-1})\\)",
+    space: "\\(\\Delta v\\)",
+    ladderspace: "\\(ladder\\;step\\)",
+    errortol:"\\(Tolerance\\)",
+    
+    m1: "\\(m_1\\;(amu)\\)",
+    m2: "\\(m_2\\;(amu)\\)",
+    netcharge: "\\(Charge\\;(e)\\)",
+    
+    Te: "\\(T_e\\;(cm^{-1})\\)",
+    De: "\\(D_e\\;(cm^{-1})\\)",
+    Ke: "\\(k_e\\;(cm^{-1}Å^{-2})\\)",
+    re: "\\(r_e\\;(Å)\\)",
+
+    // -----------------------------
+    // Vibrational coefficients
+    // -----------------------------
+    we: "\\(\\omega_e\\)",
+    xwe: "\\(\\omega_e x_e\\)",
+    ywe: "\\(\\omega_e y_e\\)",
+    zwe: "\\(\\omega_e z_e\\)",
+
+    awe: "\\(\\omega_e a_e\\)",
+    bwe: "\\(\\omega_e b_e\\)",
+    cwe: "\\(\\omega_e c_e\\)",
+    dwe: "\\(\\omega_e d_e\\)",
+    ewe: "\\(\\omega_e e_e\\)",
+    fwe: "\\(\\omega_e f_e\\)",
+    gwe: "\\(\\omega_e g_e\\)",
+    hwe: "\\(\\omega_e h_e\\)",
+    iwe: "\\(\\omega_e i_e\\)",
+    jwe: "\\(\\omega_e j_e\\)",
+    kwe: "\\(\\omega_e k_e\\)",
+    lwe: "\\(\\omega_e l_e\\)",
+
+    // -----------------------------
+    // Rotational coefficients
+    // -----------------------------
+    Be: "\\(B_e\\)",
+    ae: "\\(\\alpha_e\\)",
+    ye: "\\(\\gamma_e\\)",
+
+    _1e: "\\(\\delta_1\\)",
+    _2e: "\\(\\delta_2\\)",
+    _3e: "\\(\\delta_3\\)",
+    _4e: "\\(\\delta_4\\)",
+    _5e: "\\(\\delta_5\\)",
+    _6e: "\\(\\delta_6\\)",
+    _7e: "\\(\\delta_7\\)",
+    _8e: "\\(\\delta_8\\)",
+    _9e: "\\(\\delta_9\\)",
+    _10e: "\\(\\delta_{10}\\)",
+    _11e: "\\(\\delta_{11}\\)",
+    _12e: "\\(\\delta_{12}\\)",
+    _13e: "\\(\\delta_{13}\\)"
+};
+
+const DEFAULTS = {
+
+    // General
+    name: "Unknown",
+    state: "X",
+
+    kaiser: "0",
+    intmethod: "Fleming",
+
+    Vmax: "100",
+    space: "0.01",
+    ladderspace: "3",
+    errortol: "1e-9",
+
+    m1: "1.0",
+    m2: "1.0",
+    netcharge: "0",
+
+    Te: "0.0",
+    De: "0.0",
+    Ke: "0.0",
+    re: "0.0",
+
+    // G(v)
+    we:  "0.0",
+    xwe: "0.0",
+    ywe: "0.0",
+    zwe: "0.0",
+    awe: "0.0",
+    bwe: "0.0",
+    cwe: "0.0",
+    dwe: "0.0",
+    ewe: "0.0",
+    fwe: "0.0",
+    gwe: "0.0",
+    hwe: "0.0",
+    iwe: "0.0",
+    jwe: "0.0",
+    kwe: "0.0",
+    lwe: "0.0",
+
+    // B(v)
+    Be:  "0.0",
+    ae:  "0.0",
+    ye:  "0.0",
+
+    _1e:  "0.0",
+    _2e:  "0.0",
+    _3e:  "0.0",
+    _4e:  "0.0",
+    _5e:  "0.0",
+    _6e:  "0.0",
+    _7e:  "0.0",
+    _8e:  "0.0",
+    _9e:  "0.0",
+    _10e: "0.0",
+    _11e: "0.0",
+    _12e: "0.0",
+    _13e: "0.0"
+};
+
+[...G_KEYS, ...B_KEYS].forEach(k => DEFAULTS[k] = "0");
+
 
 function createFields(keys, containerId) {
     const box = document.getElementById(containerId);
 
     keys.forEach(key => {
         const label = document.createElement("label");
-        label.textContent = key;
+        label.innerHTML = LABELS[key] || key;
 
         const input = document.createElement("input");
         input.id = "field_" + key;
@@ -70,6 +201,8 @@ function createFields(keys, containerId) {
 createFields(G_KEYS, "gvFields");
 createFields(B_KEYS, "bvFields");
 createFields(GENERAL_KEYS, "generalFields");
+MathJax.typesetPromise();
+
 
 let RKRModule = null;
 let generatedDAT = "";
@@ -132,6 +265,7 @@ generateButton.addEventListener("click", async () => {
 
         plotDAT(generatedDAT);
         console.log("Calculation completed successfully.");
+        console.log("Download your Potential Energy Curve (PEC.dat).");
     }
     catch (err) {
         console.error(err);
@@ -154,7 +288,7 @@ downloadButton.addEventListener("click", () => {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "potential.dat";
+    a.download = "PEC.dat";
     a.click();
 
     URL.revokeObjectURL(url);
@@ -276,69 +410,6 @@ function buildInputTextFromFields() {
     }).join("\n");
 }
 
-const DEFAULTS = {
-
-    // General
-    name: "Unknown",
-    state: "X",
-
-    kaiser: "0",
-    intmethod: "Fleming",
-
-    Vmax: "100",
-    space: "0.01",
-    ladderspace: "3",
-    errortol: "1e-9",
-
-    m1: "1.0",
-    m2: "1.0",
-    netcharge: "0",
-
-    Te: "0.0",
-    De: "0.0",
-    Ke: "0.0",
-    re: "0.0",
-
-    // G(v)
-    we:  "0.0",
-    xwe: "0.0",
-    ywe: "0.0",
-    zwe: "0.0",
-    awe: "0.0",
-    bwe: "0.0",
-    cwe: "0.0",
-    dwe: "0.0",
-    ewe: "0.0",
-    fwe: "0.0",
-    gwe: "0.0",
-    hwe: "0.0",
-    iwe: "0.0",
-    jwe: "0.0",
-    kwe: "0.0",
-    lwe: "0.0",
-
-    // B(v)
-    Be:  "0.0",
-    ae:  "0.0",
-    ye:  "0.0",
-
-    _1e:  "0.0",
-    _2e:  "0.0",
-    _3e:  "0.0",
-    _4e:  "0.0",
-    _5e:  "0.0",
-    _6e:  "0.0",
-    _7e:  "0.0",
-    _8e:  "0.0",
-    _9e:  "0.0",
-    _10e: "0.0",
-    _11e: "0.0",
-    _12e: "0.0",
-    _13e: "0.0"
-};
-
-[...G_KEYS, ...B_KEYS].forEach(k => DEFAULTS[k] = "0");
-
 
 function fillDefaultFields() {
     Object.entries(DEFAULTS).forEach(([key, value]) => {
@@ -364,3 +435,5 @@ function hideLoading() {
 function nextFrame() {
     return new Promise(resolve => requestAnimationFrame(resolve));
 }
+
+

@@ -5,6 +5,15 @@
     <title>RKR Potential Generator</title>
     <link rel="stylesheet" href="rkr_webapp.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script>
+    window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body>
@@ -25,19 +34,19 @@
             <div class="coeff-grid">
 
                 <div class="param-card">
-                    <h2>G(v) coefficients</h2>
+                    <h2>G(v) coefficients (in cm$^{-1}$)</h2>
                     <div id="gvFields" class="field-grid"></div>
                 </div>
 
                 <div class="param-card">
-                    <h2>B(v) coefficients</h2>
+                    <h2>B(v) coefficients (in cm$^{-1}$)</h2>
                     <div id="bvFields" class="field-grid"></div>
                 </div>
 
             </div>
 
             <div class="param-card general-card">
-                <h2>General / run parameters</h2>
+                <h2>Other parameters</h2>
                 <div id="generalFields" class="general-fields"></div>
             </div>
 
@@ -72,7 +81,7 @@
 
         <button id="loadButton">Load file</button>
         <button id="generateButton">Generate RKR</button>
-        <button id="downloadButton">Download .dat</button>
+        <button id="downloadButton">Download PEC.dat</button>
 
         <textarea id="inputText" style="display:none;"></textarea>
 

@@ -12,7 +12,7 @@ std::string ExportPotentialDAT(const std::vector<double>& r,
                                const std::vector<double>& V)
 {
     std::ostringstream out;
-    out << "# r(Angstrom)    V(cm^-1)\n";
+    out << "# r(Å)"<<"    "<<"V(cm^-1)"<<"\n";
 
     for (size_t i = 0; i < r.size(); ++i)
         out << r[i] << "    " << V[i] << "\n";
