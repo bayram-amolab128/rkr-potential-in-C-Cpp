@@ -19,12 +19,45 @@
 #include <limits>
 
 
-struct GvParams {
-    double we{0.0}, xwe{0.0}, ywe{0.0}, zwe{0.0}, awe{0.0}, bwe{0.0}, cwe{0.0}, dwe{0.0}, ewe{0.0}, fwe{0.0}, gwe{0.0}, hwe{0.0}, iwe{0.0}, jwe{0.0}, kwe{0.0}, lwe{0.0};
+
+struct GvParams
+{
+    double we{0.0};
+    double xwe{0.0};
+    double ywe{0.0};
+    double zwe{0.0};
+    double awe{0.0};
+    double bwe{0.0};
+    double cwe{0.0};
+    double dwe{0.0};
+    double ewe{0.0};
+    double fwe{0.0};
+    double gwe{0.0};
+    double hwe{0.0};
+    double iwe{0.0};
+    double jwe{0.0};
+    double kwe{0.0};
+    double lwe{0.0};
 };
 
-struct BvParams {
-    double Be{0.0}, ae{0.0}, ye{0.0}, _1e{0.0}, _2e{0.0}, _3e{0.0}, _4e{0.0}, _5e{0.0}, _6e{0.0}, _7e{0.0}, _8e{0.0}, _9e{0.0}, _10e{0.0}, _11e{0.0}, _12e{0.0}, _13e{0.0};  
+struct BvParams
+{
+    double Be{0.0};
+    double ae{0.0};
+    double ye{0.0};
+    double _1e{0.0};
+    double _2e{0.0};
+    double _3e{0.0};
+    double _4e{0.0};
+    double _5e{0.0};
+    double _6e{0.0};
+    double _7e{0.0};
+    double _8e{0.0};
+    double _9e{0.0};
+    double _10e{0.0};
+    double _11e{0.0};
+    double _12e{0.0};
+    double _13e{0.0};
 };
 
 struct ExtraParams {
@@ -91,19 +124,13 @@ inline std::string trim(std::string s)
     return s;
 }
 
-inline bool ReadConstantsFromFile(const std::string& filename, AllParams& p)
+inline bool ReadConstantsFromStream(std::istream& in, AllParams& p)
 {
-    std::ifstream in(filename);
-
-    if (!in) {
-        std::cerr << "Could not open file: " << filename << '\n';
-        return false;
-    }
-
     std::string line;
 
     while (std::getline(in, line))
     {
+
         // Remove comments
         auto commentPos = line.find('#');
         if (commentPos != std::string::npos)
@@ -205,8 +232,24 @@ inline bool ReadConstantsFromFile(const std::string& filename, AllParams& p)
     return true;
 }
 
+inline bool ReadConstantsFromText(const std::string& text, AllParams& p)
+{
+    std::istringstream in(text);
+    return ReadConstantsFromStream(in, p);
+}
 
+inline bool ReadConstantsFromFile(const std::string& filename, AllParams& p)
+{
+    std::ifstream in(filename);
 
+    if (!in)
+    {
+        std::cerr << "Could not open file: " << filename << '\n';
+        return false;
+    }
+
+    return ReadConstantsFromStream(in, p);
+}
 
 // Reads paired arrays (r, G) from a text file into vectors.
 inline void ReadRGFromFile(const std::string& filename,

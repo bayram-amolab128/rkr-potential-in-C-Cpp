@@ -1,0 +1,47 @@
+# Compiler
+CXX := em++
+
+# Sources / headers / target
+SRCS := ./src/webapp_wrapper.cpp ./src/calculation_core.cpp
+HDRS := ./src/calculation_core.hpp ./src/calc_wrapper.hpp ./src/SplineNaK.h ./src/SplineNaK2.h
+OUT  := ./webapp/rkr.js
+
+# ---- WASM GSL ----
+GSL_INC := /c/_DEV/gsl-wasm/include
+GSL_LIB := /c/_DEV/gsl-wasm/lib
+
+# ---- Header-only libs ----
+EIGEN_DIR := ./lib/eigen-master
+
+# Include paths
+INCLUDES := -I$(EIGEN_DIR) -I$(GSL_INC)
+
+# Compile flags
+CXXFLAGS := -O3 --bind -Wall -fexceptions $(INCLUDES)
+
+EMFLAGS := -s MODULARIZE=1 \
+           -s EXPORT_NAME=\"createRKRModule\" \
+           -s INITIAL_MEMORY=268435456 \
+           -s STACK_SIZE=8388608 \
+           -s ASSERTIONS=2 \
+           -s SAFE_HEAP=1 \
+           -s NO_DISABLE_EXCEPTION_CATCHING
+           
+
+# Libraries
+LDLIBS := -L$(GSL_LIB) -lgsl -lgslcblas
+
+.PHONY: all clean info
+
+all: $(OUT)
+
+$(OUT): $(SRCS) $(HDRS)
+	$(CXX) $(SRCS) -o $(OUT) $(CXXFLAGS) $(LDLIBS) $(EMFLAGS)
+
+info:
+	@echo "CXXFLAGS:" && echo $(CXXFLAGS)
+	@echo "LDLIBS:" && echo $(LDLIBS)
+	@echo "SRCS:" && echo $(SRCS)
+
+clean:
+	$(RM) $(OUT) ./webapp/rkr.wasm
