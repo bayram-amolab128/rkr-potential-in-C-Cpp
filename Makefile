@@ -2,7 +2,7 @@
 CXX := g++
 
 # Sources / headers / target
-SRCS := ./src/RKR_gui_top.cpp ./src/calculation_core.cpp 
+SRCS := ./src/RKR_gui_top.cpp ./src/calculation_core.cpp ./src/calc_wrapper.hpp
 HDRS := ./src/calculation_core.hpp  ./src/calc_wrapper.hpp ./src/SplineNaK.h ./src/SplineNaK2.h
 OUT  := RKR_v1.exe
 # wxWidgets (static)

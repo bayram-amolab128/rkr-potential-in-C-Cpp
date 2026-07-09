@@ -468,46 +468,91 @@ public:
         // G(v) (left)
         auto* gvBox = new wxStaticBox(panel, wxID_ANY, wxString::FromUTF8("G(v) parameters (in cm⁻¹)"));
         auto* gvSizer = new wxStaticBoxSizer(gvBox, wxVERTICAL);
+        // Make G(v) region scrollable because there are many higher-order fields
+        auto* gvScroll = new wxScrolledWindow(panel, wxID_ANY, wxDefaultPosition, wxSize(-1, 220), wxVSCROLL);
+        gvScroll->SetScrollRate(5, 5);
         auto* gvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑ "),      gv.we,    351.43,    0.01, 18,
-                 wxString::FromUTF8("Fundamental vibration constant ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑxₑ "),   gv.xwe,   2.61,      0.001, 18,
-                 wxString::FromUTF8("First anharmonicity constant xₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑyₑ "),   gv.ywe,   0.00295,   0.001, 18,
-                 wxString::FromUTF8("Second anharmonicity constant yₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑzₑ "),   gv.zwe,   0.0,       0.001, 18,
-                 wxString::FromUTF8("Third anharmonicity constant zₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑaₑ "),   gv.awe,   0.0,       0.001, 18,
-                 wxString::FromUTF8("Higher-order Dunham coefficient aₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑbₑ "),   gv.bwe,   0.0,       0.001, 18,
-                 wxString::FromUTF8("Higher-order Dunham coefficient bₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑcₑ "),   gv.cwe,   0.0,       0.001, 18,
-                 wxString::FromUTF8("Higher-order Dunham coefficient cₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑdₑ "),   gv.dwe,   0.0,       0.001, 18,
-                 wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑeₑ "),   gv.ewe,   0.0,       0.001, 18,
-                 wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."));
-        addField(gvGrid, panel, wxString::FromUTF8("ωₑfₑ "),   gv.fwe,   0.0,       0.001, 18,
-                 wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑ "),      gv.we,    351.43,    0.01, 18,
+             wxString::FromUTF8("Fundamental vibration constant ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑxₑ "),   gv.xwe,   2.61,      0.001, 18,
+             wxString::FromUTF8("First anharmonicity constant xₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑyₑ "),   gv.ywe,   0.00295,   0.001, 18,
+             wxString::FromUTF8("Second anharmonicity constant yₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑzₑ "),   gv.zwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Third anharmonicity constant zₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑaₑ "),   gv.awe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient aₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑbₑ "),   gv.bwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient bₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑcₑ "),   gv.cwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient cₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑdₑ "),   gv.dwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑeₑ "),   gv.ewe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑfₑ "),   gv.fwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑgₑ "),   gv.gwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient gₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑhₑ "),   gv.hwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑiₑ "),   gv.iwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑjₑ "),   gv.jwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑkₑ "),   gv.kwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient kₑ for ωₑ."));
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑlₑ "),   gv.lwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient lₑ for ωₑ."));
+
         gvGrid->AddGrowableCol(1, 1);
-        gvSizer->Add(gvGrid, 0, wxEXPAND | wxALL, 8);
+        gvScroll->SetSizer(gvGrid);
+        gvScroll->FitInside();
+        gvSizer->Add(gvScroll, 1, wxEXPAND | wxALL, 8);
 
         // B(v) (left)
         auto* bvBox = new wxStaticBox(panel, wxID_ANY, wxString::FromUTF8("B(v) parameters (in cm⁻¹)"));
         auto* bvSizer = new wxStaticBoxSizer(bvBox, wxVERTICAL);
+        // Make B(v) region scrollable to keep layout compact
+        auto* bvScroll = new wxScrolledWindow(panel, wxID_ANY, wxDefaultPosition, wxSize(-1, 160), wxVSCROLL);
+        bvScroll->SetScrollRate(5, 5);
         auto* bvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
-        addField(bvGrid, panel, wxString::FromUTF8("Bₑ "),   bv.Be,  0.67264,  0.001, 18,
-                 wxString::FromUTF8("Equilibrium rotational constant Bₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("αₑ "),   bv.ae,  0.00704,  0.001, 18,
-                 wxString::FromUTF8("Vibration-rotation interaction constant αₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("γₑ "),   bv.ye, -0.00004,  0.00001, 18,
-                 wxString::FromUTF8("Dunham rotational coefficient γₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("γ₁ₑ "),  bv._1e, 0.0,      0.001, 18,
-                 wxString::FromUTF8("First higher-order rotational coefficient γ₁ₑ."));
-        addField(bvGrid, panel, wxString::FromUTF8("γ₂ₑ "),  bv._2e, 0.0,      0.001, 18,
-                 wxString::FromUTF8("Second higher-order rotational coefficient γ₂ₑ."));
+        addField(bvGrid, bvScroll, wxString::FromUTF8("Bₑ "),   bv.Be,  0.67264,  0.001, 18,
+             wxString::FromUTF8("Equilibrium rotational constant Bₑ."));
+        addField(bvGrid, bvScroll, wxString::FromUTF8("αₑ "),   bv.ae,  0.00704,  0.001, 18,
+             wxString::FromUTF8("Vibration-rotation interaction constant αₑ."));
+        addField(bvGrid, bvScroll, wxString::FromUTF8("γₑ "),   bv.ye, -0.00004,  0.00001, 18,
+             wxString::FromUTF8("Dunham rotational coefficient γₑ."));
+        addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁ₑ "),  bv._1e, 0.0,      0.001, 18,
+             wxString::FromUTF8("First higher-order rotational coefficient γ₁ₑ."));
+        addField(bvGrid, bvScroll, wxString::FromUTF8("γ₂ₑ "),  bv._2e, 0.0,      0.001, 18,
+             wxString::FromUTF8("Second higher-order rotational coefficient γ₂ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₃ₑ "),  bv._3e, 0.0,      0.001, 18,
+               wxString::FromUTF8("Third higher-order rotational coefficient γ₃ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₄ₑ "),  bv._4e, 0.0,      0.001, 18,
+               wxString::FromUTF8("Fourth higher-order rotational coefficient γ₄ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₅ₑ "),  bv._5e, 0.0,      0.001, 18,
+               wxString::FromUTF8("Fifth higher-order rotational coefficient γ₅ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₆ₑ "),  bv._6e, 0.0,      0.001, 18,
+               wxString::FromUTF8("Sixth higher-order rotational coefficient γ₆ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₇ₑ "),  bv._7e, 0.0,      0.001, 18,
+               wxString::FromUTF8("Seventh higher-order rotational coefficient γ₇ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₈ₑ "),  bv._8e, 0.0,      0.001, 18,
+               wxString::FromUTF8("Eighth higher-order rotational coefficient γ₈ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₉ₑ "),  bv._9e, 0.0,      0.001, 18,
+               wxString::FromUTF8("Ninth higher-order rotational coefficient γ₉ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₀ₑ"),  bv._10e, 0.0,     0.001, 18,
+               wxString::FromUTF8("Tenth higher-order rotational coefficient γ₁₀ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₁ₑ"),  bv._11e, 0.0,     0.001, 18,
+               wxString::FromUTF8("Eleventh higher-order rotational coefficient γ₁₁ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₂ₑ"),  bv._12e, 0.0,     0.001, 18,
+               wxString::FromUTF8("Twelfth higher-order rotational coefficient γ₁₂ₑ."));
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₃ₑ"),  bv._13e, 0.0,     0.001, 18,
+               wxString::FromUTF8("Thirteenth higher-order rotational coefficient γ₁₃ₑ."));
         bvGrid->AddGrowableCol(1, 1);
-        bvSizer->Add(bvGrid, 0, wxEXPAND | wxALL, 8);
+        bvScroll->SetSizer(bvGrid);
+        bvScroll->FitInside();
+        bvSizer->Add(bvScroll, 0, wxEXPAND | wxALL, 8);
 
         // Extras (left)
         auto* extraBox = new wxStaticBox(panel, wxID_ANY, "General parameters");
@@ -645,8 +690,8 @@ public:
     }
 
 private:
-    struct { NumField we,xwe,ywe,zwe,awe,bwe,cwe,dwe,ewe,fwe; } gv;
-    struct { NumField Be,ae,ye,_1e,_2e; } bv;
+    struct { NumField we,xwe,ywe,zwe,awe,bwe,cwe,dwe,ewe,fwe, gwe, hwe, iwe, jwe, kwe, lwe; } gv;
+    struct { NumField Be,ae,ye,_1e,_2e,_3e,_4e,_5e,_6e,_7e,_8e,_9e,_10e,_11e,_12e,_13e; } bv;
     struct { NumField m1,m2,space,Vmax, Te; } extras;
     struct { NumField De, ke; } morse;
 
@@ -726,17 +771,17 @@ private:
         p.gv.we  = val(gv.we);   p.gv.xwe = val(gv.xwe); p.gv.ywe = val(gv.ywe);
         p.gv.zwe = val(gv.zwe);  p.gv.awe = val(gv.awe); p.gv.bwe = val(gv.bwe);
         p.gv.cwe = val(gv.cwe);  p.gv.dwe = val(gv.dwe); p.gv.ewe = val(gv.ewe);
-        p.gv.fwe = val(gv.fwe);  //p.gv.gwe = val(gv.gwe); p.gv.hwe = val(gv.hwe);
-        //p.gv.iwe = val(gv.iwe);  p.gv.jwe = val(gv.jwe); p.gv.kwe = val(gv.kwe); 
-        //p.gv.lwe = val(gv.lwe);
+        p.gv.fwe = val(gv.fwe);  p.gv.gwe = val(gv.gwe); p.gv.hwe = val(gv.hwe);
+        p.gv.iwe = val(gv.iwe);  p.gv.jwe = val(gv.jwe); p.gv.kwe = val(gv.kwe); 
+        p.gv.lwe = val(gv.lwe);
 
         // B(v) params
         p.bv.Be = val(bv.Be);      p.bv.ae = val(bv.ae);
         p.bv.ye = val(bv.ye);      p.bv._1e = val(bv._1e);
-        p.bv._2e  = val(bv._2e);   //p.bv._3e  = val(bv._3e);   p.bv._4e  = val(bv._4e);
-        //p.bv._5e  = val(bv._5e);   p.bv._6e  = val(bv._6e);   p.bv._7e  = val(bv._7e);
-        //p.bv._8e  = val(bv._8e);   p.bv._9e  = val(bv._9e);   p.bv._10e = val(bv._10e);
-        //p.bv._11e = val(bv._11e);  p.bv._12e = val(bv._12e);  p.bv._13e = val(bv._13e);
+        p.bv._2e  = val(bv._2e);   p.bv._3e  = val(bv._3e);   p.bv._4e  = val(bv._4e);
+        p.bv._5e  = val(bv._5e);   p.bv._6e  = val(bv._6e);   p.bv._7e  = val(bv._7e);
+        p.bv._8e  = val(bv._8e);   p.bv._9e  = val(bv._9e);   p.bv._10e = val(bv._10e);
+        p.bv._11e = val(bv._11e);  p.bv._12e = val(bv._12e);  p.bv._13e = val(bv._13e);
 
         // Extras
         p.ex.m1 = val(extras.m1);
@@ -860,11 +905,17 @@ private:
         m["we"]  = gv.we.ctrl;   m["xwe"] = gv.xwe.ctrl;  m["ywe"] = gv.ywe.ctrl;
         m["zwe"] = gv.zwe.ctrl;  m["awe"] = gv.awe.ctrl;  m["bwe"] = gv.bwe.ctrl;
         m["cwe"] = gv.cwe.ctrl;  m["dwe"] = gv.dwe.ctrl;  m["ewe"] = gv.ewe.ctrl;
-        m["fwe"] = gv.fwe.ctrl;
+        m["fwe"] = gv.fwe.ctrl;  m["gwe"] = gv.gwe.ctrl;  m["hwe"] = gv.hwe.ctrl;
+        m["iwe"] = gv.iwe.ctrl;  m["jwe"] = gv.jwe.ctrl;  m["kwe"] = gv.kwe.ctrl;
+        m["lwe"] = gv.lwe.ctrl;
 
         // B(v)
         m["Be"]  = bv.Be.ctrl;   m["ae"]  = bv.ae.ctrl;   m["ye"]  = bv.ye.ctrl;
         m["_1e"] = bv._1e.ctrl;  m["_2e"] = bv._2e.ctrl;
+        m["_3e"] = bv._3e.ctrl;  m["_4e"] = bv._4e.ctrl;  m["_5e"] = bv._5e.ctrl;
+        m["_6e"] = bv._6e.ctrl;  m["_7e"] = bv._7e.ctrl;  m["_8e"] = bv._8e.ctrl;
+        m["_9e"] = bv._9e.ctrl;  m["_10e"] = bv._10e.ctrl; m["_11e"] = bv._11e.ctrl;
+        m["_12e"] = bv._12e.ctrl; m["_13e"] = bv._13e.ctrl;
 
         // Extras
         m["m1"]    = extras.m1.ctrl;

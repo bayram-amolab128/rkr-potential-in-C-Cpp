@@ -20,11 +20,11 @@
 
 
 struct GvParams {
-    double we{}, xwe{}, ywe{}, zwe{}, awe{}, bwe{}, cwe{}, dwe{}, ewe{}, fwe{}, gwe{}, hwe{}, iwe{}, jwe{}, kwe{}, lwe{};
+    double we{0.0}, xwe{0.0}, ywe{0.0}, zwe{0.0}, awe{0.0}, bwe{0.0}, cwe{0.0}, dwe{0.0}, ewe{0.0}, fwe{0.0}, gwe{0.0}, hwe{0.0}, iwe{0.0}, jwe{0.0}, kwe{0.0}, lwe{0.0};
 };
 
 struct BvParams {
-    double Be{}, ae{}, ye{}, _1e{}, _2e{}, _3e{}, _4e{}, _5e{}, _6e{}, _7e{}, _8e{}, _9e{}, _10e{}, _11e{}, _12e{}, _13e{};  
+    double Be{0.0}, ae{0.0}, ye{0.0}, _1e{0.0}, _2e{0.0}, _3e{0.0}, _4e{0.0}, _5e{0.0}, _6e{0.0}, _7e{0.0}, _8e{0.0}, _9e{0.0}, _10e{0.0}, _11e{0.0}, _12e{0.0}, _13e{0.0};  
 };
 
 struct ExtraParams {
