@@ -438,7 +438,8 @@ private:
 // ---------- UI ----------
 struct NumField {
     wxStaticText* label{};
-    wxSpinCtrlDouble* ctrl{};
+    wxWindow* editor{};
+    bool useText{};
 };
 
 static wxSpinCtrlDouble* makeNum(wxWindow* parent, double val=0.0, double inc=0.1, int digits=6,
@@ -473,37 +474,37 @@ public:
         gvScroll->SetScrollRate(5, 5);
         auto* gvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑ "),      gv.we,    351.43,    0.01, 18,
-             wxString::FromUTF8("Fundamental vibration constant ωₑ."));
+             wxString::FromUTF8("Fundamental vibration constant ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑxₑ "),   gv.xwe,   2.61,      0.001, 18,
-             wxString::FromUTF8("First anharmonicity constant xₑ for ωₑ."));
+             wxString::FromUTF8("First anharmonicity constant xₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑyₑ "),   gv.ywe,   0.00295,   0.001, 18,
-             wxString::FromUTF8("Second anharmonicity constant yₑ for ωₑ."));
+             wxString::FromUTF8("Second anharmonicity constant yₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑzₑ "),   gv.zwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Third anharmonicity constant zₑ for ωₑ."));
+             wxString::FromUTF8("Third anharmonicity constant zₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑaₑ "),   gv.awe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient aₑ for ωₑ."));
+             wxString::FromUTF8("Higher-order Dunham coefficient aₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑbₑ "),   gv.bwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient bₑ for ωₑ."));
+             wxString::FromUTF8("Higher-order Dunham coefficient bₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑcₑ "),   gv.cwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient cₑ for ωₑ."));
+             wxString::FromUTF8("Higher-order Dunham coefficient cₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑdₑ "),   gv.dwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."));
+             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑeₑ "),   gv.ewe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."));
+             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."), true);
         addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑfₑ "),   gv.fwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."));
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑgₑ "),   gv.gwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient gₑ for ωₑ."));
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑhₑ "),   gv.hwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."));
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑiₑ "),   gv.iwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."));
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑjₑ "),   gv.jwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."));
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑkₑ "),   gv.kwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient kₑ for ωₑ."));
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑlₑ "),   gv.lwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient lₑ for ωₑ."));
+             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑgₑ "),   gv.gwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient gₑ for ωₑ."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑhₑ "),   gv.hwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑiₑ "),   gv.iwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑjₑ "),   gv.jwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑkₑ "),   gv.kwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient kₑ for ωₑ."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑlₑ "),   gv.lwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient lₑ for ωₑ."), true);
 
         gvGrid->AddGrowableCol(1, 1);
         gvScroll->SetSizer(gvGrid);
@@ -518,37 +519,37 @@ public:
         bvScroll->SetScrollRate(5, 5);
         auto* bvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
         addField(bvGrid, bvScroll, wxString::FromUTF8("Bₑ "),   bv.Be,  0.67264,  0.001, 18,
-             wxString::FromUTF8("Equilibrium rotational constant Bₑ."));
+             wxString::FromUTF8("Equilibrium rotational constant Bₑ."), true);
         addField(bvGrid, bvScroll, wxString::FromUTF8("αₑ "),   bv.ae,  0.00704,  0.001, 18,
-             wxString::FromUTF8("Vibration-rotation interaction constant αₑ."));
+             wxString::FromUTF8("Vibration-rotation interaction constant αₑ."), true);
         addField(bvGrid, bvScroll, wxString::FromUTF8("γₑ "),   bv.ye, -0.00004,  0.00001, 18,
-             wxString::FromUTF8("Dunham rotational coefficient γₑ."));
+             wxString::FromUTF8("Dunham rotational coefficient γₑ."), true);
         addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁ₑ "),  bv._1e, 0.0,      0.001, 18,
-             wxString::FromUTF8("First higher-order rotational coefficient γ₁ₑ."));
+             wxString::FromUTF8("First higher-order rotational coefficient γ₁ₑ."), true);
         addField(bvGrid, bvScroll, wxString::FromUTF8("γ₂ₑ "),  bv._2e, 0.0,      0.001, 18,
-             wxString::FromUTF8("Second higher-order rotational coefficient γ₂ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₃ₑ "),  bv._3e, 0.0,      0.001, 18,
-               wxString::FromUTF8("Third higher-order rotational coefficient γ₃ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₄ₑ "),  bv._4e, 0.0,      0.001, 18,
-               wxString::FromUTF8("Fourth higher-order rotational coefficient γ₄ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₅ₑ "),  bv._5e, 0.0,      0.001, 18,
-               wxString::FromUTF8("Fifth higher-order rotational coefficient γ₅ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₆ₑ "),  bv._6e, 0.0,      0.001, 18,
-               wxString::FromUTF8("Sixth higher-order rotational coefficient γ₆ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₇ₑ "),  bv._7e, 0.0,      0.001, 18,
-               wxString::FromUTF8("Seventh higher-order rotational coefficient γ₇ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₈ₑ "),  bv._8e, 0.0,      0.001, 18,
-               wxString::FromUTF8("Eighth higher-order rotational coefficient γ₈ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₉ₑ "),  bv._9e, 0.0,      0.001, 18,
-               wxString::FromUTF8("Ninth higher-order rotational coefficient γ₉ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₀ₑ"),  bv._10e, 0.0,     0.001, 18,
-               wxString::FromUTF8("Tenth higher-order rotational coefficient γ₁₀ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₁ₑ"),  bv._11e, 0.0,     0.001, 18,
-               wxString::FromUTF8("Eleventh higher-order rotational coefficient γ₁₁ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₂ₑ"),  bv._12e, 0.0,     0.001, 18,
-               wxString::FromUTF8("Twelfth higher-order rotational coefficient γ₁₂ₑ."));
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₃ₑ"),  bv._13e, 0.0,     0.001, 18,
-               wxString::FromUTF8("Thirteenth higher-order rotational coefficient γ₁₃ₑ."));
+             wxString::FromUTF8("Second higher-order rotational coefficient γ₂ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₃ₑ "),  bv._3e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Third higher-order rotational coefficient γ₃ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₄ₑ "),  bv._4e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Fourth higher-order rotational coefficient γ₄ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₅ₑ "),  bv._5e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Fifth higher-order rotational coefficient γ₅ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₆ₑ "),  bv._6e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Sixth higher-order rotational coefficient γ₆ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₇ₑ "),  bv._7e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Seventh higher-order rotational coefficient γ₇ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₈ₑ "),  bv._8e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Eighth higher-order rotational coefficient γ₈ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₉ₑ "),  bv._9e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Ninth higher-order rotational coefficient γ₉ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₀ₑ"),  bv._10e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Tenth higher-order rotational coefficient γ₁₀ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₁ₑ"),  bv._11e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Eleventh higher-order rotational coefficient γ₁₁ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₂ₑ"),  bv._12e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Twelfth higher-order rotational coefficient γ₁₂ₑ."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₃ₑ"),  bv._13e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Thirteenth higher-order rotational coefficient γ₁₃ₑ."), true);
         bvGrid->AddGrowableCol(1, 1);
         bvScroll->SetSizer(bvGrid);
         bvScroll->FitInside();
@@ -710,22 +711,42 @@ private:
 
     void addField(wxFlexGridSizer* grid, wxWindow* parent, const wxString& name,
               NumField& slot, double defVal, double inc, int digits,
-              const wxString& hint = {}) {
+              const wxString& hint = {}, bool useText = false) {
         slot.label = new wxStaticText(parent, wxID_ANY, name + ":");
-        slot.ctrl  = makeNum(parent, defVal, inc, digits);
+        slot.useText = useText;
+        if (useText) {
+            auto initial = wxString::Format("%.*g", digits, defVal);
+            auto* txt = new wxTextCtrl(parent, wxID_ANY, initial, wxDefaultPosition, wxSize(140, -1));
+            slot.editor = txt;
+        } else {
+            slot.editor = makeNum(parent, defVal, inc, digits);
+        }
 
         if (!hint.empty()) {
             slot.label->SetToolTip(hint);
-            slot.ctrl->SetToolTip(hint);
+            if (slot.useText) {
+                static_cast<wxTextCtrl*>(slot.editor)->SetToolTip(hint);
+            } else {
+                static_cast<wxSpinCtrlDouble*>(slot.editor)->SetToolTip(hint);
+            }
         }
 
         grid->Add(slot.label, 0, wxALIGN_CENTER_VERTICAL);
-        grid->Add(slot.ctrl,  1, wxEXPAND);
+        grid->Add(slot.editor,  1, wxEXPAND);
     }
 
     // safer getter
     double val(const NumField& f, double def = 0.0) const {
-        return f.ctrl ? f.ctrl->GetValue() : def;
+        if (!f.editor) return def;
+        if (f.useText) {
+            auto* txt = static_cast<wxTextCtrl*>(f.editor);
+            try {
+                return std::stod(std::string(txt->GetValue().mb_str()));
+            } catch (...) {
+                return def;
+            }
+        }
+        return static_cast<wxSpinCtrlDouble*>(f.editor)->GetValue();
     }
 
     // Maintain fixed aspect ratio during resize
@@ -898,40 +919,52 @@ private:
             return 0;
         }
 
-        // Map parameter names -> control pointers
-        std::unordered_map<std::string, wxSpinCtrlDouble*> m;
+        // Map parameter names -> editor widgets
+        std::unordered_map<std::string, wxWindow*> m;
 
         // G(v)
-        m["we"]  = gv.we.ctrl;   m["xwe"] = gv.xwe.ctrl;  m["ywe"] = gv.ywe.ctrl;
-        m["zwe"] = gv.zwe.ctrl;  m["awe"] = gv.awe.ctrl;  m["bwe"] = gv.bwe.ctrl;
-        m["cwe"] = gv.cwe.ctrl;  m["dwe"] = gv.dwe.ctrl;  m["ewe"] = gv.ewe.ctrl;
-        m["fwe"] = gv.fwe.ctrl;  m["gwe"] = gv.gwe.ctrl;  m["hwe"] = gv.hwe.ctrl;
-        m["iwe"] = gv.iwe.ctrl;  m["jwe"] = gv.jwe.ctrl;  m["kwe"] = gv.kwe.ctrl;
-        m["lwe"] = gv.lwe.ctrl;
+        m["we"]  = gv.we.editor;   m["xwe"] = gv.xwe.editor;  m["ywe"] = gv.ywe.editor;
+        m["zwe"] = gv.zwe.editor;  m["awe"] = gv.awe.editor;  m["bwe"] = gv.bwe.editor;
+        m["cwe"] = gv.cwe.editor;  m["dwe"] = gv.dwe.editor;  m["ewe"] = gv.ewe.editor;
+        m["fwe"] = gv.fwe.editor;  m["gwe"] = gv.gwe.editor;  m["hwe"] = gv.hwe.editor;
+        m["iwe"] = gv.iwe.editor;  m["jwe"] = gv.jwe.editor;  m["kwe"] = gv.kwe.editor;
+        m["lwe"] = gv.lwe.editor;
 
         // B(v)
-        m["Be"]  = bv.Be.ctrl;   m["ae"]  = bv.ae.ctrl;   m["ye"]  = bv.ye.ctrl;
-        m["_1e"] = bv._1e.ctrl;  m["_2e"] = bv._2e.ctrl;
-        m["_3e"] = bv._3e.ctrl;  m["_4e"] = bv._4e.ctrl;  m["_5e"] = bv._5e.ctrl;
-        m["_6e"] = bv._6e.ctrl;  m["_7e"] = bv._7e.ctrl;  m["_8e"] = bv._8e.ctrl;
-        m["_9e"] = bv._9e.ctrl;  m["_10e"] = bv._10e.ctrl; m["_11e"] = bv._11e.ctrl;
-        m["_12e"] = bv._12e.ctrl; m["_13e"] = bv._13e.ctrl;
+        m["Be"]  = bv.Be.editor;   m["ae"]  = bv.ae.editor;   m["ye"]  = bv.ye.editor;
+        m["_1e"] = bv._1e.editor;  m["_2e"] = bv._2e.editor;
+        m["_3e"] = bv._3e.editor;  m["_4e"] = bv._4e.editor;  m["_5e"] = bv._5e.editor;
+        m["_6e"] = bv._6e.editor;  m["_7e"] = bv._7e.editor;  m["_8e"] = bv._8e.editor;
+        m["_9e"] = bv._9e.editor;  m["_10e"] = bv._10e.editor; m["_11e"] = bv._11e.editor;
+        m["_12e"] = bv._12e.editor; m["_13e"] = bv._13e.editor;
 
         // Extras
-        m["m1"]    = extras.m1.ctrl;
-        m["m2"]    = extras.m2.ctrl;
-        m["Te"]    = extras.Te.ctrl;
-        ///m["kaiser"]= extras.kaiser.ctrl;
-        m["Vmax"]  = extras.Vmax.ctrl;
-        m["space"] = extras.space.ctrl;
+        m["m1"]    = extras.m1.editor;
+        m["m2"]    = extras.m2.editor;
+        m["Te"]    = extras.Te.editor;
+        ///m["kaiser"]= extras.kaiser.editor;
+        m["Vmax"]  = extras.Vmax.editor;
+        m["space"] = extras.space.editor;
 
-       
         // Morse
-        m["De"]    = morse.De.ctrl;
-        m["ke"]    = morse.ke.ctrl;
+        m["De"]    = morse.De.editor;
+        m["ke"]    = morse.ke.editor;
 
         int count = 0;
         std::string line;
+
+        // Clear all numeric inputs first so parameters omitted from the file do not keep old values.
+        for (auto& kv : m) {
+            if (!kv.second) continue;
+            if (auto* sc = wxDynamicCast(kv.second, wxSpinCtrlDouble)) {
+                sc->SetValue(0.0);
+            } else if (auto* txt = wxDynamicCast(kv.second, wxTextCtrl)) {
+                txt->SetValue("0");
+            }
+        }
+        if (kaiserCheck) {
+            kaiserCheck->SetValue(false);
+        }
 
         auto trim = [](std::string& s){
             size_t a = s.find_first_not_of(" \t\r\n");
@@ -985,7 +1018,11 @@ private:
             if (it != m.end() && it->second) {
                 try {
                     double d = std::stod(val);
-                    it->second->SetValue(d);
+                    if (auto* sc = wxDynamicCast(it->second, wxSpinCtrlDouble)) {
+                        sc->SetValue(d);
+                    } else if (auto* txt = wxDynamicCast(it->second, wxTextCtrl)) {
+                        txt->SetValue(val);
+                    }
                     ++count;
                 } catch (...) {
                     output->AppendText(wxString::Format("Bad value for %s: %s\n", key, val));
