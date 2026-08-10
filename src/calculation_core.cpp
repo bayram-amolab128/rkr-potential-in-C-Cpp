@@ -22,6 +22,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multifit_nlinear.h>
 #include <gsl/gsl_blas.h>
+#include <gsl/gsl_integration.h>
 
 //external libraries.
 #include "SplineNaK2.h"
@@ -36,7 +37,7 @@
 
 bool inwardDetected = false;
 bool outwardDetected = true;
-
+bool useFleming = true; //true: use Fleming integrals, false: use Klein integrals.
 
 RKRContext CreateRKRContext(const AllParams& p, CalcParam &cp)
 {
@@ -60,8 +61,8 @@ RKRContext CreateRKRContext(const AllParams& p, CalcParam &cp)
     rkr.mu = (m1 * m2) / (m1 + m2 - rkr.netcharge * rkr.me);
     rkr.Te = p.ex.Te;
 
-    const double vmax_trunc = rkr.ve.checkAndTruncateVmax();
-    const double vmax = std::min(p.ex.Vmax, vmax_trunc);
+    //const double vmax_trunc = rkr.ve.checkAndTruncateVmax();
+    const double vmax = p.ex.Vmax;//std::min(p.ex.Vmax, vmax_trunc);
     const double vmin = rkr.ve.kaiser_correction_vmin();
 
     cp.v_step = p.ex.space;
@@ -78,11 +79,12 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
 {
     //don't abort the program if error is received.
     //gsl_set_error_handler_off();
+    gsl_integration_workspace* w = gsl_integration_workspace_alloc(limit);
 
   
     //control variables.
-    double abserrtol      = 1e-10;    //fixed abs. error tolerance.
-    double relerrtol      = 8e-10;    //fixed rel. error tolerance.
+    double abserrtol      = cp.abserrtol;    //fixed abs. error tolerance.
+    double relerrtol      = cp.relerrtol;    //fixed rel. error tolerance.
     //errors.
     double errfF         = 0.0;      //absolute error from gsl_integration_qags.
     double errgF         = 0.0;
@@ -129,12 +131,12 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
         }   
 
         // Fleming integrals called from rkr_procedure.h
-        fF = rkr.ve.fFleming(v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF);
-        gF = rkr.ve.gFleming(v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF);
+        fF = rkr.ve.f(useFleming,v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
+        gF = rkr.ve.g(useFleming,v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF,w);
 
         //evaluation errors.
         if (!std::isfinite(fF) || !std::isfinite(gF) || gF == 0.0){
-            printf("Undefined or nan for fF=%g, gF=%g, or gF=%g is 0.0\n", fF, gF, gF); 
+            //printf("Undefined or nan for fF=%g, gF=%g, or gF=%g is 0.0\n", fF, gF, gF); 
             //break;
             continue; // extra safety, skip this v and continue.
         }
@@ -152,7 +154,7 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
         r2v = rkr.r2_from_fg(fF, gF);
 
         if (!std::isfinite(r1v) || !std::isfinite(r2v) || !std::isfinite(Gv)){
-            printf("nan r1v, r2v, or Gv at v=%f\n",v);
+            //printf("nan r1v, r2v, or Gv at v=%f\n",v);
             break;
         }
 
@@ -171,8 +173,10 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
 
             const double v_ex = 0.65 * v;        //go down to 65% of suspect v to avoid curvature.
             const double v_ex_level = std::round(v_ex);
-            fF = rkr.ve.fFleming(v_ex_level, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF);
-            gF = rkr.ve.gFleming(v_ex_level, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF);
+
+            fF = rkr.ve.f(useFleming,v_ex_level, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
+            gF = rkr.ve.g(useFleming,v_ex_level, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF,w);
+
             cp.v_ex =  v_ex;
             cp.v_ex_level =  v_ex_level;
 
@@ -180,7 +184,7 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
             cp.r_ex =  rkr.r1_from_fg(fF, gF);       //set at v_ex_level*0.85 later.
             cp.V_ex =  rkr.ve.G(v_ex_level) + rkr.Te;//set at v_ex_level*0.85 later.
 
-            printf("Inward curvature detected at v = %f, select v_ex_level at 0.65 of v for extrapolation\n", v);
+            //printf("Inward curvature detected at v = %f, select v_ex_level at 0.65 of v for extrapolation\n", v);
             break; // stop collecting raw tail
         }
         else {
@@ -200,14 +204,14 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
     }
 
     //write errors as the function of v.
-    WriteRGToFile("./output/err_fF_vs_v.dat", v_, err_fF);
-    WriteRGToFile("./output/err_gF_vs_v.dat", v_, err_gF);
+    //WriteRGToFile("./output/err_fF_vs_v.dat", v_, err_fF);
+    //WriteRGToFile("./output/err_gF_vs_v.dat", v_, err_gF);
 
-    WriteRGToFile("./output/fFleming_vs_v.dat", v_, fF_);
-    WriteRGToFile("./output/gFleming_vs_v.dat", v_, gF_);
+    //WriteRGToFile("./output/fFleming_vs_v.dat", v_, fF_);
+    //WriteRGToFile("./output/gFleming_vs_v.dat", v_, gF_);
 
 
-    printf("Combining inner and outer branches together for raw RKR.\n");
+    //printf("Combining inner and outer branches together for raw RKR.\n");
     for (std::size_t i = 0; i < 2*r1.size(); ++i) { //r1.size() = r2.size() =G.size()
         if(i<r1.size()){
             r.push_back(r1[i]);      // r1(v)
@@ -219,14 +223,15 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
         }
     }
 
-    printf("Sorting r in increasing order, and rearranging V(r) accordingly for raw RKR.\n");
+    //printf("Sorting r in increasing order, and rearranging V(r) accordingly for raw RKR.\n");
     SortPaired(V, r);
     //also find the v_ex, r_ex index.
 
 
-    WriteRGToFile("./output/rawRKR.dat", r, V);
+    //WriteRGToFile("./output/rawRKR.dat", r, V);
 
-    printf("The program exits raw rkr calculation loop.\n");
+    //printf("The program exits raw rkr calculation loop.\n");
+    gsl_integration_workspace_free(w);
 }//end of calc.
 
 void setEquilibriumPoint( std::vector<double>& V,  std::vector<double>& r, CalcParam &cp)
@@ -249,8 +254,8 @@ void setEquilibriumPoint( std::vector<double>& V,  std::vector<double>& r, CalcP
 
     SortPaired(V, r); // Ensure V and r are sorted after adding the equilibrium point.
 
-    WriteRGToFile("./output/rawRKR.dat", r, V);
-    printf("Equilibrium parameters determined: re = %f, V_re = %f\n", cp.re, cp.V_re);
+    //WriteRGToFile("./output/rawRKR.dat", r, V);
+    //printf("Equilibrium parameters determined: re = %f, V_re = %f\n", cp.re, cp.V_re);
 }
 
 //calculates the calc partameters such as v_ex, re, ...
@@ -259,7 +264,7 @@ void determineExtraPIndices(std::vector<double> &V, std::vector<double> &r, Calc
     const size_t i_ex_inner = findClosestIndex(r, cp.r_ex);
     cp.i_ex_inner =   i_ex_inner; //still need to calculate outer.
     //
-    std::cout<<"i_ex_inner "<<cp.i_ex_inner<<std::endl;
+    //std::cout<<"i_ex_inner "<<cp.i_ex_inner<<std::endl;
 
 
     size_t i_ex_outer = splitandfindClosestIndex(V, cp.i_re, cp.V_ex) + cp.i_re;
@@ -298,7 +303,7 @@ SplineNaK::Spline SplineFit_to_RKR(std::vector<double>& V, std::vector<double>& 
    double rmax = cp.rmax;
 
 
-    printf("The minimum and maximum of r: %f %f\n", rmin, rmax);
+    //printf("The minimum and maximum of r: %f %f\n", rmin, rmax);
 
     double dx    = 1e-3;               // spline step size.
     double rmax2 =  (rmax + rmin)/2.0; //midpoint
@@ -308,8 +313,8 @@ SplineNaK::Spline SplineFit_to_RKR(std::vector<double>& V, std::vector<double>& 
         r_spl.push_back(x);
         V_spl.push_back(s(x));
     }
-    WriteRGToFile("./output/spline_rawRKR.dat", r_spl, V_spl);
-    printf("Not-A-Knot cubic spline is fitted through the raw RKR data\n");
+    //WriteRGToFile("./output/spline_rawRKR.dat", r_spl, V_spl);
+    //printf("Not-A-Knot cubic spline is fitted through the raw RKR data\n");
 
     return s; //returns the evaluated spline.
 }
@@ -321,7 +326,7 @@ bool detectOutwardCurvature(const std::vector<double>& V,
 {
     std::vector<size_t> i_res =  findMinimumIndices(V,r);
     cp.i_re = average(i_res);
-    std::cout<<"The index for re = "<<cp.i_re<<std::endl;
+    //std::cout<<"The index for re = "<<cp.i_re<<std::endl;
     double lastCurvature = 1.0;
 
     const size_t i_re = cp.i_re;
@@ -329,7 +334,7 @@ bool detectOutwardCurvature(const std::vector<double>& V,
         throw std::runtime_error("detectOutwardCurvature: V and r size mismatch.");
 
     if (V.size() < 3){
-        std::cout<<"Not enough data points for curvature detection, returning no curvature."<<std::endl;
+        //std::cout<<"Not enough data points for curvature detection, returning no curvature."<<std::endl;
         return false;
     }
     if (i_re >= V.size())
@@ -356,7 +361,7 @@ bool detectOutwardCurvature(const std::vector<double>& V,
         //std::cout<<"curvature= "<<curvature<<std::endl;
         
         if(curvature<0.0 && lastCurvature>0.0){
-            std::cout<<"Warning: outward curvature detected at r = "<<r1<<std::endl;
+            //std::cout<<"Warning: outward curvature detected at r = "<<r1<<std::endl;
             //calculate v-level
             
             cp.v_s=cp.vmax- i*cp.v_step;
@@ -365,7 +370,7 @@ bool detectOutwardCurvature(const std::vector<double>& V,
             cp.V_s=V1;
             cp.i_s=i;  
             cp.v_ex = cp.v_s;//if outward curvature detected, v_ex is set to v_s.
-            cp.v_ex_level = std::floor(cp.v_ex);
+            cp.v_ex_level = std::floor(0.65*cp.v_ex);
 
             ///not necessary to calculate r_ex and V_ex here, as they will be calculated later.
             cp.V_ex = V1; //set at v_ex_level*0.85 later.
@@ -375,7 +380,7 @@ bool detectOutwardCurvature(const std::vector<double>& V,
 
         lastCurvature = curvature;
     }
-    printf("No outward curvature detected in the inner branch.\n");
+    //printf("No outward curvature detected in the inner branch.\n");
     return false;           // no outward curvature detected
 }
 
@@ -385,9 +390,10 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
                               CalcParam &cp, RKRContext &rkr)
 {
 
+    gsl_integration_workspace* w =gsl_integration_workspace_alloc(limit);
     //control variables.
-    double abserrtol      = 1e-12;    //fixed abs. error tolerance.
-    double relerrtol      = 8e-12;    //fixed rel. error tolerance.
+    double abserrtol      = cp.abserrtol;    //fixed abs. error tolerance.
+    double relerrtol      = cp.relerrtol;    //fixed rel. error tolerance.
     //errors.
     double errfF         = 0.0;      //absolute error from gsl_integration_qags.
     double errgF         = 0.0;
@@ -409,11 +415,11 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
     double vmax   = cp.vmax;
 
     //       
-    std::ofstream out("./output/n_est_data.dat");
-    if (!out) {
-        throw std::runtime_error("Could not open output.dat");
-    }
-    out << std::fixed << std::setprecision(14);
+    //std::ofstream out("./output/n_est_data.dat");
+    //if (!out) {
+     //   throw std::runtime_error("Could not open output.dat");
+    //}
+    //out << std::fixed << std::setprecision(14);
 
     double d2V=0.0;
     double d1V=0.0;
@@ -431,12 +437,14 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
         n=n+1.0;
         
         // Fleming integrals called from rkr_procedure.h
-        fF = rkr.ve.fFleming(v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF);
-        gF = rkr.ve.gFleming(v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF);
 
+
+        fF = rkr.ve.f(useFleming,v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
+        gF = rkr.ve.g(useFleming,v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF,w);
+   
         //evaluation errors.
         if (!std::isfinite(fF) || !std::isfinite(gF) || gF == 0.0){
-            printf("Undefined or nan for fF=%g, gF=%g, or gF=%g is 0.0\n", fF, gF, gF); 
+           // printf("Undefined or nan for fF=%g, gF=%g, or gF=%g is 0.0\n", fF, gF, gF); 
             break;
         }
  
@@ -446,39 +454,43 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
 
          //n_i = n_i - d2V_slice[i]/d1V_slice[i] * r_slice[i] - 1.0;
         n_i = n_i - d2V/d1V * r_eval - 1.0;
-        out <<v<< '\t' <<r_eval << '\t' << d1V<< '\t' << d2V<<'\n';
+        //out <<v<< '\t' <<r_eval << '\t' << d1V<< '\t' << d2V<<'\n';
     }
 
 
-    out.close();
+    //out.close();
     //average the n_is.
     n_avg = std::round(n_i/n);
-    std::cout<<"n_i "<< n_i << " n "<<n<<std::endl;
+    //std::cout<<"n_i "<< n_i << " n "<<n<<std::endl;
 
 
     double v_1 = std::floor(v_ex_level*0.85)-1.0;
     // Fleming integrals called from rkr_procedure.h
-    fF = rkr.ve.fFleming(v_1, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF);
-    gF = rkr.ve.gFleming(v_1, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF);
+
+    fF = rkr.ve.f(useFleming,v_1, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
+    gF = rkr.ve.g(useFleming,v_1, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF,w);
+
     double r1= rkr.r1_from_fg(fF, gF);
     double V1= rkr.ve.G(v_1) + rkr.Te;
 
 
     double v_2 = std::floor(v_ex_level*0.85);
     // Fleming integrals called from rkr_procedure.h
-    fF = rkr.ve.fFleming(v_2, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF);
-    gF = rkr.ve.gFleming(v_2, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF);
+
+    fF = rkr.ve.f(useFleming,v_2, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
+    gF = rkr.ve.g(useFleming,v_2, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF,w);
+
     double r2=rkr.r1_from_fg(fF, gF);
     double V2= rkr.ve.G(v_2) + rkr.Te;
 
 
     double A = (V1 - V2)/((1.0/std::pow(r1,n_avg)) - (1.0/std::pow(r2, n_avg))) ;
-    std::cout<<"A "<<A<<" "<< V1<<" "<<V2<<std::endl;
+    //std::cout<<"A "<<A<<" "<< V1<<" "<<V2<<std::endl;
     double B = V2 - A/(std::pow(r2, n_avg));
 
     //construct_InnerWall( A,B, n_avg);
     //(Asmooth/r^(integerPower)) + Bsmooth;
-    printf("r1=%f r2=%f and V1=%f  V2=%f.\n Estimated n-power law value, A and B, %d, %g, and %g\n",r1, r2, V1, V2, n_avg, A, B);
+    //printf("r1=%f r2=%f and V1=%f  V2=%f.\n Estimated n-power law value, A and B, %d, %g, and %g\n",r1, r2, V1, V2, n_avg, A, B);
 
     cp.A = A;
     cp.B = B;
@@ -487,7 +499,9 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
     //also set extraploation r and V
     cp.r_ex = r2;
     cp.V_ex = V2;
-    std::cout<<"r_ex "<<cp.r_ex<<" V_ex "<<cp.V_ex<<std::endl;
+    //std::cout<<"r_ex "<<cp.r_ex<<" V_ex "<<cp.V_ex<<std::endl;
+
+    gsl_integration_workspace_free(w);
 
 }
 
@@ -495,7 +509,7 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
 void construct_ExtraPCurve(RKRContext &rkr, const CalcParam &cp,
                          std::vector<double>& V_inner, std::vector<double>& r_inner,
                          std::vector<double>& V_outer, std::vector<double>& r_outer){
-
+    gsl_integration_workspace* w =gsl_integration_workspace_alloc(limit);
     //(Asmooth/r^(integerPower)) + Bsmooth;
     double Gv=0.0;
     double rv_=0.0;
@@ -516,7 +530,7 @@ void construct_ExtraPCurve(RKRContext &rkr, const CalcParam &cp,
     double A = cp.A;
     double B = cp.B;
 
-    std::cout<<A<<" "<<B<<" "<<n<<std::endl;
+    //std::cout<<A<<" "<<B<<" "<<n<<std::endl;
 
     for (double v = v_start; v <= vmax; v +=v_step) {
         Gv = rkr.ve.G(v) + rkr.Te;
@@ -524,7 +538,9 @@ void construct_ExtraPCurve(RKRContext &rkr, const CalcParam &cp,
         rv_ = cp.A/(Gv-cp.B);
 
         r1 = std::pow(rv_, 1.0/n);
-        fF = rkr.ve.fFleming(v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol, nullptr);
+
+   
+        fF = rkr.ve.f(useFleming,v, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol, nullptr, w);
 
 
         //this is where Near Dissociation extrapolation need to be applied.
@@ -541,8 +557,9 @@ void construct_ExtraPCurve(RKRContext &rkr, const CalcParam &cp,
 
     SortPaired(V_inner, r_inner);
     SortPaired(V_outer, r_outer);
-    WriteRGToFile("./output/extraP_Inner.dat", r_inner, V_inner);
-    WriteRGToFile("./output/extraP_Outer.dat", r_outer, V_outer);
+    //WriteRGToFile("./output/extraP_Inner.dat", r_inner, V_inner);
+    //WriteRGToFile("./output/extraP_Outer.dat", r_outer, V_outer);
+    gsl_integration_workspace_free(w);
 }
 
 void combine_inner_outer_rkr(std::vector<double>& V_inner, std::vector<double>& r_inner,
@@ -578,7 +595,7 @@ void combine_inner_outer_rkr(std::vector<double>& V_inner, std::vector<double>& 
         V.push_back(V_outer[i]);
     }
 
-    WriteRGToFile("./output/totalPEC.dat", r, V);
+    //WriteRGToFile("./output/totalPEC.dat", r, V);
 }
 
 
@@ -714,3 +731,4 @@ std::ostream& operator<<(std::ostream& os, const AllParams& p)
 
     return os;
 }
+

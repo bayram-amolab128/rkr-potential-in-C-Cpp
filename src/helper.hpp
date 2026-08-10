@@ -209,7 +209,7 @@ inline bool ReadConstantsFromStream(std::istream& in, AllParams& p)
             else if (key == "Vmax") p.ex.Vmax = std::stod(val);
             //else if (key == "errortol") p.ex.errortol = std::stod(val);
             else if (key == "kaiser" || key == "UseKaiser") {
-                std::cout << "UseKaiser: " << val << std::endl;
+                //std::cout << "UseKaiser: " << val << std::endl;
                 p.ex.UseKaiser = std::stod(val);
             }
             else if (key == "Te") p.ex.Te = std::stod(val);
@@ -218,7 +218,7 @@ inline bool ReadConstantsFromStream(std::istream& in, AllParams& p)
             else if (key == "re" || key == "Re") p.ex.Re = std::stod(val);
 
             else {
-                std::cerr << "Unknown key skipped: [" << key << "] = [" << val << "]\n";
+                //std::cerr << "Unknown key skipped: [" << key << "] = [" << val << "]\n";
             }
         }
         catch (const std::exception& e)
@@ -244,7 +244,7 @@ inline bool ReadConstantsFromFile(const std::string& filename, AllParams& p)
 
     if (!in)
     {
-        std::cerr << "Could not open file: " << filename << '\n';
+        //std::cerr << "Could not open file: " << filename << '\n';
         return false;
     }
 
@@ -258,7 +258,7 @@ inline void ReadRGFromFile(const std::string& filename,
 {
     std::ifstream fin(filename);
     if (!fin.is_open()) {
-        throw std::runtime_error("ReadRGFromFile: cannot open file '" + filename + "'");
+        //throw std::runtime_error("ReadRGFromFile: cannot open file '" + filename + "'");
     }
 
     r.clear();

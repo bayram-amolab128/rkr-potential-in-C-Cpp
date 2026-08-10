@@ -11,6 +11,10 @@
 #include <gsl/gsl_integration.h>
 
 
+const size_t limit = 100000;
+//double resabs = 0.0;
+//double resasc = 0.0;
+
 class rkr_procedure {
 private:
     // coefficients
@@ -34,8 +38,14 @@ public:
     double kaiser_correction_vmin() const;
     double checkAndTruncateVmax(double step = 0.0001, double abstol = 1e-6) const;
 
-    double fFleming(double vib, double Cu, double mu, double vmin, double abstol = 1e-6, double reltol = 1e-6, double *err = nullptr) const;
-    double gFleming(double vib, double Cu, double mu, double vmin, double abstol = 1e-6, double reltol = 1e-6, double *err =nullptr) const;
+    double fFleming(double vib, double Cu, double mu, double vmin, double abstol = 1e-14, double reltol = 1e-10, double *err = nullptr, gsl_integration_workspace* w = nullptr) const;
+    double gFleming(double vib, double Cu, double mu, double vmin, double abstol = 1e-14, double reltol = 1e-10, double *err =nullptr, gsl_integration_workspace* w = nullptr) const;
+
+    double fKlein(double vib,double Cu,double mu,double vmin,double abstol = 1e-14,double reltol = 1e-10,double* err = nullptr, gsl_integration_workspace* w = nullptr) const;
+    double gKlein(double vib,double Cu,double mu,double vmin,double abstol = 1e-14,double reltol = 1e-10,double* err = nullptr, gsl_integration_workspace* w = nullptr) const;
+
+    double f(bool useFleming, double vib, double Cu, double mu, double vmin, double abstol = 1e-14, double reltol = 1e-10, double* err = nullptr, gsl_integration_workspace* w = nullptr) const;
+    double g(bool useFleming, double vib, double Cu, double mu, double vmin, double abstol = 1e-14, double reltol = 1e-10, double* err = nullptr, gsl_integration_workspace* w = nullptr) const;
 
     double B(double vib) const;
     double dB(double vib) const;
@@ -81,7 +91,7 @@ inline double rkr_procedure::kaiser_correction_vmin() const {
     if (UseKaiser == 1.0) {
         double Y10 = we;
         double y00 = kaiser_correction_Y00();
-        std::cout << "Kaiser correction for Y00: " << y00 << std::endl;
+        //std::cout << "Kaiser correction for Y00: " << y00 << std::endl;
         return -0.5 - y00 / Y10;
     }
     return -0.5;
@@ -89,80 +99,176 @@ inline double rkr_procedure::kaiser_correction_vmin() const {
 
 
 // ---------------- G(v), dG, d2G ----------------
-inline double rkr_procedure::G(double vib) const {
-    double x = vib + 0.5;
-    return we * std::pow(x, 1) + xwe * std::pow(x, 2) + ywe * std::pow(x, 3)
-         + zwe * std::pow(x, 4) + awe * std::pow(x, 5) + bwe * std::pow(x, 6)
-         + cwe * std::pow(x, 7) + dwe * std::pow(x, 8) + ewe * std::pow(x, 9)
-         + fwe * std::pow(x,10) + gwe * std::pow(x,11) + hwe * std::pow(x,12)
-         + iwe * std::pow(x,13) + jwe * std::pow(x,14) + kwe * std::pow(x,15)
-         + lwe * std::pow(x,16) + Y00_0;
+//inline double rkr_procedure::G(double vib) const {
+//    double x = vib + 0.5;
+//    return we * std::pow(x, 1) + xwe * std::pow(x, 2) + ywe * std::pow(x, 3)
+//         + zwe * std::pow(x, 4) + awe * std::pow(x, 5) + bwe * std::pow(x, 6)
+//         + cwe * std::pow(x, 7) + dwe * std::pow(x, 8) + ewe * std::pow(x, 9)
+//         + fwe * std::pow(x,10) + gwe * std::pow(x,11) + hwe * std::pow(x,12)
+//         + iwe * std::pow(x,13) + jwe * std::pow(x,14) + kwe * std::pow(x,15)
+//         + lwe * std::pow(x,16) + Y00_0;
+//}
+//horner style for G(v) and dG(v)
+inline double rkr_procedure::G(double vib) const
+{
+    const double x = vib + 0.5;
+
+    double y = lwe;
+    y = y*x + kwe;
+    y = y*x + jwe;
+    y = y*x + iwe;
+    y = y*x + hwe;
+    y = y*x + gwe;
+    y = y*x + fwe;
+    y = y*x + ewe;
+    y = y*x + dwe;
+    y = y*x + cwe;
+    y = y*x + bwe;
+    y = y*x + awe;
+    y = y*x + zwe;
+    y = y*x + ywe;
+    y = y*x + xwe;
+    y = y*x + we;
+
+    return y*x + Y00_0;
 }
 
-inline double rkr_procedure::dG(double vib) const {
-    double x = vib + 0.5;
-    return we
-         + 2.0 * xwe * std::pow(x, 1)
-         + 3.0 * ywe * std::pow(x, 2)
-         + 4.0 * zwe * std::pow(x, 3)
-         + 5.0 * awe * std::pow(x, 4)
-         + 6.0 * bwe * std::pow(x, 5)
-         + 7.0 * cwe * std::pow(x, 6)
-         + 8.0 * dwe * std::pow(x, 7)
-         + 9.0 * ewe * std::pow(x, 8)
-         +10.0 * fwe * std::pow(x, 9)
-         +11.0 * gwe * std::pow(x,10)
-         +12.0 * hwe * std::pow(x,11)
-         +13.0 * iwe * std::pow(x,12)
-         +14.0 * jwe * std::pow(x,13)
-         +15.0 * kwe * std::pow(x,14)
-         +16.0 * lwe * std::pow(x,15);
+
+//inline double rkr_procedure::dG(double vib) const {
+//    double x = vib + 0.5;
+//    return we
+//         + 2.0 * xwe * std::pow(x, 1)
+//         + 3.0 * ywe * std::pow(x, 2)
+//         + 4.0 * zwe * std::pow(x, 3)
+//         + 5.0 * awe * std::pow(x, 4)
+//         + 6.0 * bwe * std::pow(x, 5)
+//         + 7.0 * cwe * std::pow(x, 6)
+//         + 8.0 * dwe * std::pow(x, 7)
+//         + 9.0 * ewe * std::pow(x, 8)
+//         +10.0 * fwe * std::pow(x, 9)
+//         +11.0 * gwe * std::pow(x,10)
+//         +12.0 * hwe * std::pow(x,11)
+//         +13.0 * iwe * std::pow(x,12)
+//         +14.0 * jwe * std::pow(x,13)
+//         +15.0 * kwe * std::pow(x,14)
+//         +16.0 * lwe * std::pow(x,15);
+//}
+
+inline double rkr_procedure::dG(double vib) const
+{
+    const double x = vib + 0.5;
+
+    double y = 16.0*lwe;
+    y = y*x + 15.0*kwe;
+    y = y*x + 14.0*jwe;
+    y = y*x + 13.0*iwe;
+    y = y*x + 12.0*hwe;
+    y = y*x + 11.0*gwe;
+    y = y*x + 10.0*fwe;
+    y = y*x +  9.0*ewe;
+    y = y*x +  8.0*dwe;
+    y = y*x +  7.0*cwe;
+    y = y*x +  6.0*bwe;
+    y = y*x +  5.0*awe;
+    y = y*x +  4.0*zwe;
+    y = y*x +  3.0*ywe;
+    y = y*x +  2.0*xwe;
+
+    return y*x + we;
 }
 
-inline double rkr_procedure::d2G(double vib) const {
-    double x = vib + 0.5;
-    return +2.0 * xwe
-         + 6.0 * ywe * std::pow(x, 1)
-         +12.0 * zwe * std::pow(x, 2)
-         +20.0 * awe * std::pow(x, 3)
-         +30.0 * bwe * std::pow(x, 4)
-         +42.0 * cwe * std::pow(x, 5)
-         +56.0 * dwe * std::pow(x, 6)
-         +72.0 * ewe * std::pow(x, 7)
-         +90.0 * fwe * std::pow(x, 8)
-         +110.0 * gwe * std::pow(x, 9)
-         +132.0 * hwe * std::pow(x,10)
-         +156.0 * iwe * std::pow(x,11)
-         +182.0 * jwe * std::pow(x,12)
-         +210.0 * kwe * std::pow(x,13)
-         +240.0 * lwe * std::pow(x,14);
+inline double rkr_procedure::d2G(double vib) const
+{
+    const double x = vib + 0.5;
+
+    double y = 240.0 * lwe;
+    y = y*x + 210.0 * kwe;
+    y = y*x + 182.0 * jwe;
+    y = y*x + 156.0 * iwe;
+    y = y*x + 132.0 * hwe;
+    y = y*x + 110.0 * gwe;
+    y = y*x +  90.0 * fwe;
+    y = y*x +  72.0 * ewe;
+    y = y*x +  56.0 * dwe;
+    y = y*x +  42.0 * cwe;
+    y = y*x +  30.0 * bwe;
+    y = y*x +  20.0 * awe;
+    y = y*x +  12.0 * zwe;
+    y = y*x +   6.0 * ywe;
+
+    return y*x + 2.0*xwe;
 }
 
 
 // ---------------- B(v), dB ----------------
-inline double rkr_procedure::B(double vib) const {
-    double x = vib + 0.5;
-    return be + ae * x + ye * std::pow(x,2) + _1e * std::pow(x,3) + _2e * std::pow(x,4) + _3e * std::pow(x,5) + _4e * std::pow(x,6) + _5e * std::pow(x,7) + _6e * std::pow(x,8)+ _7e * std::pow(x,9) + _8e * std::pow(x,10) + _9e * std::pow(x,11) + _10e * std::pow(x,12) + _11e * std::pow(x,13) + _12e * std::pow(x,14) +_13we * std::pow(x,15);
+//inline double rkr_procedure::B(double vib) const {
+//    double x = vib + 0.5;
+//    return be + ae * x + ye * std::pow(x,2) + _1e * std::pow(x,3) + _2e * std::pow(x,4) + _3e * std::pow(x,5) + _4e * std::pow(x,6) + _5e * std::pow(x,7) + _6e * std::pow(x,8)+ _7e * std::pow(x,9) + _8e * std::pow(x,10) + _9e * std::pow(x,11) + _10e * std::pow(x,12) + _11e * std::pow(x,13) + _12e * std::pow(x,14) +_13we * std::pow(x,15);
+//}
+inline double rkr_procedure::B(double vib) const
+{
+    const double x = vib + 0.5;
+
+    double y = _13we;
+    y = y*x + _12e;
+    y = y*x + _11e;
+    y = y*x + _10e;
+    y = y*x + _9e;
+    y = y*x + _8e;
+    y = y*x + _7e;
+    y = y*x + _6e;
+    y = y*x + _5e;
+    y = y*x + _4e;
+    y = y*x + _3e;
+    y = y*x + _2e;
+    y = y*x + _1e;
+    y = y*x + ye;
+    y = y*x + ae;
+
+    return y*x + be;
 }
 
-inline double rkr_procedure::dB(double vib) const {
-    double x = vib + 0.5;
-    return +ae
-           + 2.0 * ye  * std::pow(x,1)
-           + 3.0 * _1e * std::pow(x,2)
-           + 4.0 * _2e * std::pow(x,3)
-           + 5.0 * _3e * std::pow(x,4)
-           + 6.0 * _4e * std::pow(x,5)
-           + 7.0 * _5e * std::pow(x,6)
-           + 8.0 * _6e * std::pow(x,7)
-           + 9.0 * _7e * std::pow(x,8)
-           + 10.0 * _8e * std::pow(x,9)
-           + 11.0 * _9e * std::pow(x,10)
-           + 12.0 * _10e * std::pow(x,11)
-           + 13.0 * _11e * std::pow(x,12)
-           + 14.0 * _12e * std::pow(x,13)
-           + 15.0 * _13we * std::pow(x,14);
+//inline double rkr_procedure::dB(double vib) const {
+//    double x = vib + 0.5;
+//    return +ae
+//           + 2.0 * ye  * std::pow(x,1)
+//           + 3.0 * _1e * std::pow(x,2)
+//           + 4.0 * _2e * std::pow(x,3)
+//           + 5.0 * _3e * std::pow(x,4)
+//           + 6.0 * _4e * std::pow(x,5)
+//           + 7.0 * _5e * std::pow(x,6)
+//           + 8.0 * _6e * std::pow(x,7)
+//           + 9.0 * _7e * std::pow(x,8)
+//           + 10.0 * _8e * std::pow(x,9)
+//           + 11.0 * _9e * std::pow(x,10)
+//           + 12.0 * _10e * std::pow(x,11)
+//           + 13.0 * _11e * std::pow(x,12)
+//           + 14.0 * _12e * std::pow(x,13)
+//           + 15.0 * _13we * std::pow(x,14);
+//}
+
+inline double rkr_procedure::dB(double vib) const
+{
+    const double x = vib + 0.5;
+
+    double y = 15.0 * _13we;
+    y = y*x + 14.0 * _12e;
+    y = y*x + 13.0 * _11e;
+    y = y*x + 12.0 * _10e;
+    y = y*x + 11.0 * _9e;
+    y = y*x + 10.0 * _8e;
+    y = y*x +  9.0 * _7e;
+    y = y*x +  8.0 * _6e;
+    y = y*x +  7.0 * _5e;
+    y = y*x +  6.0 * _4e;
+    y = y*x +  5.0 * _3e;
+    y = y*x +  4.0 * _2e;
+    y = y*x +  3.0 * _1e;
+    y = y*x +  2.0 * ye;
+
+    return y*x + ae;
 }
+
 
 // ---------------- Vmax truncation ----------------
 inline double rkr_procedure::checkAndTruncateVmax(double step, double abstol) const {
@@ -196,7 +302,7 @@ inline double rkr_procedure::checkAndTruncateVmax(double step, double abstol) co
         return (vmax > Gmax) ? Gmax : vmax;
     }
 
-    std::cerr << "Warning: no extremum (dG=0) found up to v=" << vmax << "\n";
+    //std::cerr << "Warning: no extremum (dG=0) found up to v=" << vmax << "\n";
     return vmax;
 }
 
@@ -209,8 +315,33 @@ struct KleinParams {
     double Bv;
 };
 
+
+static double integrand_f_klein(double x, void* params)
+{
+    KleinParams* p =static_cast<KleinParams*>(params);
+
+    const double diffE = p->Gv - p->ve->G(x);
+
+    // Guard against roundoff.
+    // QAGS does not normally evaluate exactly at the endpoint.
+    if (diffE <= 0.0)return 0.0;
+
+    return 1.0 / std::sqrt(diffE);
+}
+
+static double integrand_g_klein(double x, void* params)
+{
+    KleinParams* p =static_cast<KleinParams*>(params);
+
+    const double diffE =p->Gv - p->ve->G(x);
+
+    if (diffE <= 0.0)return 0.0;
+
+    return p->ve->B(x) /std::sqrt(diffE);
+}
+
 // integrand for first fleming integral
-static double integrand_f(double x, void* params) {
+static double integrand_f_fleming(double x, void* params) {
     KleinParams* p = static_cast<KleinParams*>(params);
 
     double diffE = p->Gv - p->ve->G(x);
@@ -223,7 +354,7 @@ static double integrand_f(double x, void* params) {
 }
 
 // integrand for second fleming integral
-static double integrand_g(double x, void* params) {
+static double integrand_g_fleming(double x, void* params) {
     KleinParams* p = static_cast<KleinParams*>(params);
 
     double diffE = p->Gv - p->ve->G(x);
@@ -235,8 +366,9 @@ static double integrand_g(double x, void* params) {
     return diff / denom;
 }
 
-inline double rkr_procedure::fFleming(double vib, double Cu, double mu, double vmin, double abstol, double reltol, double *err) const {
-    gsl_integration_workspace* w = gsl_integration_workspace_alloc(100000);
+
+
+inline double rkr_procedure::fFleming(double vib, double Cu, double mu, double vmin, double abstol, double reltol, double *err, gsl_integration_workspace* w) const {
 
     KleinParams params{this, G(vib), dG(vib), 0.0};
 
@@ -248,21 +380,35 @@ inline double rkr_procedure::fFleming(double vib, double Cu, double mu, double v
     double term = 2.0 * std::sqrt(argTerm);
 
     gsl_function F;
-    F.function = &integrand_f;
+    F.function = &integrand_f_fleming;
     F.params   = &params;
 
     double result = 0.0, local_err=0.0;
 
     //                           AbsTol=abstol, RelTol=1e-6      
-    gsl_integration_qag(&F, vmin, vib, abstol, reltol, 100000,GSL_INTEG_GAUSS61, w, &result, &local_err);
+    //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS15, w, &result, &local_err);
+    //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS31, w, &result, &local_err);
+    //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS61, w, &result, &local_err);
+    //printf("vmin=%f, vib=%f, abstol=%e, reltol=%e\n", vmin, vib, abstol, reltol);
+    gsl_integration_qags(&F, vmin, vib, abstol, reltol, limit, w, &result, &local_err);
+    double resabs = 0.0;
+    double resasc = 0.0;   
+    //gsl_integration_qk61(&F,vmin,vib,&result,&local_err,&resabs,&resasc);
     if(err) *err =  local_err;
+    //if(local_err>=1e-10) std::cerr << "Warning: the absolute error approached by the fFleming integral is " << local_err << "\n";
+  
+    
+    double final_result =  (term + result);
+   
+    //because local_err is the absolute error of the integral.
+    double rel_err =local_err / std::abs(final_result);
+    //if(rel_err>=1e-10) std::cerr << "Warning: the relative error approached by the gFleming integral is " << rel_err << "\n";
 
-    gsl_integration_workspace_free(w);
-    return factor * (term + result);
+    
+    return factor *final_result;
 }
 
-inline double rkr_procedure::gFleming(double vib, double Cu, double mu, double vmin, double abstol, double reltol, double *err) const {
-    gsl_integration_workspace* w = gsl_integration_workspace_alloc(100000);
+inline double rkr_procedure::gFleming(double vib, double Cu, double mu, double vmin, double abstol, double reltol, double *err,  gsl_integration_workspace* w) const {
 
     KleinParams params{this, G(vib), dG(vib), B(vib)};
 
@@ -274,18 +420,95 @@ inline double rkr_procedure::gFleming(double vib, double Cu, double mu, double v
     double term = 2.0 * params.Bv * std::sqrt(argTerm);
 
     gsl_function F;
-    F.function = &integrand_g;
+    F.function = &integrand_g_fleming;
     F.params   = &params;
 
     double result = 0.0, local_err=0.0;
                                    //abserr, relerr
-    gsl_integration_qag(&F, vmin, vib, abstol, reltol, 100000, GSL_INTEG_GAUSS61, w, &result, &local_err);
-    //gsl_integration_qags(&F, vmin, vib, abstol, reltol, 100000, w, &result, &local_err);
-    if(err) *err = local_err;
-    //printf("The absolute error approached by the gFleming integral is %g\n", local_err);
+    // gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS15, w, &result, &local_err);
+    //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS31, w, &result, &local_err);
+    //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS61, w, &result, &local_err);
+    gsl_integration_qags(&F, vmin, vib, abstol, reltol, limit, w, &result, &local_err);
+    double resabs = 0.0;
+    double resasc = 0.0;
+    //gsl_integration_qk61(&F,vmin,vib,&result,&local_err,&resabs,&resasc);
+    //if(local_err>=1e-10) std::cerr << "Warning: the absolute error approached by the gFleming integral is " << local_err << "\n";
+    
+    double final_result =  (term + result);
 
-    gsl_integration_workspace_free(w);
-    return factor * (term + result);
+    double rel_err =local_err / std::abs(final_result);
+    //if(rel_err>=1e-10) std::cerr << "Warning: the relative error approached by the gFleming integral is " << rel_err << "\n";
+
+    
+    return factor *final_result;
+}
+
+
+inline double rkr_procedure::fKlein(double vib,double Cu,double mu,double vmin,double abstol,double reltol,double* err, gsl_integration_workspace* w) const
+{
+    KleinParams params{this,G(vib),0.0,0.0};
+
+    gsl_function F;
+    F.function = &integrand_f_klein;
+    F.params   = &params;
+
+    double result = 0.0;
+    double local_err = 0.0;
+
+    /*
+        QAGS is used here because the ordinary Klein integral
+        retains the integrable square-root singularity at x=vib.
+    */
+    gsl_integration_qags(&F,vmin,vib,abstol,reltol,limit,w,&result,&local_err);
+
+    if (err) *err = local_err;
+
+    const double factor =std::sqrt(Cu / mu);
+
+    return factor * result;
+}
+
+
+inline double rkr_procedure::gKlein(double vib,double Cu,double mu,double vmin,double abstol,double reltol,double* err, gsl_integration_workspace* w) const
+{
+    KleinParams params{this,G(vib),0.0,0.0};
+
+    gsl_function F;
+    F.function = &integrand_g_klein;
+    F.params   = &params;
+
+    double result = 0.0;
+    double local_err = 0.0;
+
+    /*
+        QAGS is used here because the ordinary Klein integral
+        retains the integrable square-root singularity at x=vib.
+    */
+    gsl_integration_qags(&F,vmin,vib,abstol,reltol,limit,w,&result,&local_err);
+
+    if (err) *err = local_err;
+
+    const double factor =std::sqrt(mu / Cu);
+
+    return factor * result;
+}
+
+inline double rkr_procedure::f(bool useFleming, double vib, double Cu, double mu, double vmin, double abstol, double reltol, double* err, gsl_integration_workspace* w) const
+{
+    if (useFleming) {
+        return fFleming(vib, Cu, mu, vmin, abstol, reltol, err, w);
+    } else {
+        return fKlein(vib, Cu, mu, vmin, abstol, reltol, err, w);
+    }
+}
+
+inline double rkr_procedure::g(bool useFleming, double vib, double Cu, double mu, double vmin, double abstol, double reltol, double* err, gsl_integration_workspace* w) const
+{
+    if (useFleming) {
+        return gFleming(vib, Cu, mu, vmin, abstol, reltol, err, w);
+    } else {
+        return gKlein(vib, Cu, mu, vmin, abstol, reltol, err, w);
+    }
 }
 
 #endif

@@ -47,7 +47,7 @@ struct CalcParam{
     bool detectOutwardCurv{false};
 
     //
-    double abserrtol{1e-10};    //fixed abs. error tolerance.
+    double abserrtol{0.0};    //fixed abs. error tolerance.
     double relerrtol{1e-9};    //fixed rel. error tolerance.
 
     //

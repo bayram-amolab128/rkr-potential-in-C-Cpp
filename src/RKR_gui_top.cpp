@@ -818,21 +818,85 @@ private:
         p.ex.De = val(morse.De, 0.0);
         p.ex.ke = val(morse.ke, 0.0);
 
+        std::ofstream timing_file("cpp_timing_all.txt");
+
+        // header
+        timing_file << "Step_Size N_Points Timing_ms\n";
+
+
+        std::vector<double> steps;
+
+        std::ifstream file("steps.txt");
+        printf("Here is 1\n");
+
+        if (!file.is_open())
+            //throw std::runtime_error("Could not open file: " + "steps.txt");
+
+       
+         printf("Here is 2\n");
+        for(int i = 0; i < 100; i++)
+        {
+            double step;
+            file >> step;
+
+            if (file.fail())
+                break;
+
+            steps.push_back(step);
+            printf("Step %d: %f\n", i, step);
+        }
+
+        for(int i = 0; i < 100; i++)
+        {
+            
+            printf("Step %d: %f\n", i, steps[i]);
+        }
+
+        gsl_set_error_handler_off();        
+        for(int i = 0; i < 100; i++) {  
+            // Read all parameters once from the input text
+        if (!ReadConstantsFromText("I2B.dat", p))
+        {
+            printf("Error reading input parameters.\n");
+            return;
+        }
+        //printf("Here %d\n", i);
+        // Keep original parameters unchanged
+        const AllParams base_p = p;  
         // Calls heavy calc (fills E & r)
         output->AppendText(wxString::Format("Performing turning point calculations... wait!\n"));
         r.clear(); E.clear();
 
-        auto start = std::chrono::high_resolution_clock::now();
+        p.ex.space  = steps[i];
+        //auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         
-
         calc_wrapper(E, r, E_v, r_v, v, p, cp);   //calculates E and r values;
         
 
-        auto end   = std::chrono::high_resolution_clock::now();
+        //auto end   = std::chrono::high_resolution_clock::now();
+        auto end   = std::chrono::steady_clock::now();
 
-        std::chrono::duration<double> elapsed = end - start;
-        output->AppendText(wxString::Format("Calculation Complete, elapsed time = %f seconds.\n", elapsed.count()));
+            // time in milliseconds
+        double elapsed_ms =
+        std::chrono::duration<double, std::milli>(
+            end - start
+        ).count();
+         // number of calculated points
+        std::size_t npoints = static_cast<std::size_t>(E.size() / 2.0);
 
+        // write:
+        // step_size   npoints   time_ms
+        timing_file<<std::fixed << std::setprecision(6)
+        << steps[i] << " "
+        << npoints << " "
+        << elapsed_ms
+        << "\n";
+
+        
+        output->AppendText(wxString::Format("Calculation Complete, elapsed time = %f seconds.\n", elapsed_ms / 1000.0));
+        }
+        timing_file.close();
 
         //save in file for further analysis
         printf("=============\n"); 

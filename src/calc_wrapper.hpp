@@ -27,7 +27,7 @@ inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vec
     
    //create the output folder for all outputs.
     try {
-        std::filesystem::create_directories("./output");
+      //  std::filesystem::create_directories("./output");
     } catch (const std::exception& e) {
         std::cerr << "Failed to create output folder: " << e.what() << "\n";
     }
@@ -36,7 +36,7 @@ inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vec
     SplineNaK::Spline s;
 
     RKRContext rkr = CreateRKRContext(p, cp);     //rkr procedure.
-    std::cout<< p << std::endl;
+    //std::cout<< p << std::endl;
 
 
     std::vector<double> r_raw;
@@ -65,13 +65,13 @@ inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vec
 
     if(!cp.detectInwardCurv){
         cp.detectOutwardCurv= detectOutwardCurvature(V_raw, r_raw,  cp);
-        std::cout<< cp.detectOutwardCurv<<std::endl;
+        //std::cout<< cp.detectOutwardCurv<<std::endl;
     }
     s=SplineFit_to_RKR(V_raw, r_raw,V_spl, r_spl, cp);
     estimateInnerWall_params(s, r_raw, V_raw, cp, rkr);
     determineExtraPIndices(V_raw, r_raw, cp);
     construct_ExtraPCurve(rkr, cp, V_i, r_i, V_o, r_o);
-    std::cout << cp << '\n';
+   // std::cout <<"v_ex :" <<cp.v_ex <<" v_ex_level: "<< cp.v_ex_level << '\n';
 
     combine_inner_outer_rkr(V_i, r_i, V_o, r_o, V_raw, r_raw, V, r, cp);
 
