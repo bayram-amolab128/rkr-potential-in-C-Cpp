@@ -66,6 +66,7 @@ RKRContext CreateRKRContext(const AllParams& p, CalcParam &cp)
     const double vmin = rkr.ve.kaiser_correction_vmin();
 
     cp.v_step = p.ex.space;
+    printf("vmin = %f, vmax = %f, v_step = %f\n", vmin, vmax, cp.v_step);
     cp.vmin   = vmin;
     cp.vmax   = vmax;
 
@@ -120,7 +121,7 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
 
 
     const double vmax     =  cp.vmax;
-    const double vmin     =  cp.vmin-0.01; //Small numerical offset to smoothen bottom of the potential well.
+    const double vmin     =  cp.vmin; //Small numerical offset to smoothen bottom of the potential well.
     const double v_step   =  cp.v_step;
     cp.V_re  =  rkr.Te;
     //calculates the turning points, Gv, i.e., raw RKR.

@@ -59,6 +59,8 @@ inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vec
     std::vector<double> d1V_l;
     std::vector<double> d2V_l;
 
+    std::cout<< "Kaiser correction for vmin: " << rkr.ve.kaiser_correction_vmin() << std::endl;
+    
     calc_rawRKR(V_raw, r_raw, p, cp, rkr);
 
     setEquilibriumPoint(V_raw, r_raw, cp);
@@ -76,7 +78,8 @@ inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vec
     combine_inner_outer_rkr(V_i, r_i, V_o, r_o, V_raw, r_raw, V, r, cp);
 
     //need to add the discrete energy levels to the output later.
-
+    std::cout<<"v_min = "<<cp.vmin<<", v_max = "<<cp.vmax<<", v_step = "<<cp.v_step<<std::endl;
+    std::cout<<"v_ex_level = "<<cp.v_ex_level<<std::endl;
     return 0;
 
 }

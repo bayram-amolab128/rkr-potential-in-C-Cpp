@@ -48,7 +48,7 @@ struct CalcParam{
 
     //
     double abserrtol{0.0};    //fixed abs. error tolerance.
-    double relerrtol{1e-9};    //fixed rel. error tolerance.
+    double relerrtol{1e-11};    //fixed rel. error tolerance.
 
     //
     double rmin{0.0};

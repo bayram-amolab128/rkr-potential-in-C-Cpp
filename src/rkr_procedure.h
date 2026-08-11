@@ -67,7 +67,7 @@ inline rkr_procedure::rkr_procedure(double we_,  double xwe_,  double ywe_, doub
       Te(Te_), De(De_), ke(ke_), re(re_),
       vmax(vmax_), space(space_), ladderspace(ladderspace_), UseKaiser(UseKaiser_)
 {
-    Y00_0      = kaiser_correction_Y00();
+    Y00_0      = (UseKaiser == 1.0) ? kaiser_correction_Y00() : 0.0;
     vmax_trunc = checkAndTruncateVmax();
     // no other side effects
 }
@@ -77,8 +77,8 @@ inline rkr_procedure::rkr_procedure(double we_,  double xwe_,  double ywe_, doub
 inline double rkr_procedure::kaiser_correction_Y00() const {
     double Y10 = we;
     double Y01 = be;
-    double Y20 = -1.0 * xwe;
-    double Y11 = -1.0 * ae;
+    double Y20 = xwe;
+    double Y11 = ae;
 
     double y00 = 0.250 * (Y01 + Y20)
                  - ((Y11 * Y10) / (12.0 * Y01))
@@ -91,9 +91,11 @@ inline double rkr_procedure::kaiser_correction_vmin() const {
     if (UseKaiser == 1.0) {
         double Y10 = we;
         double y00 = kaiser_correction_Y00();
+        
         //std::cout << "Kaiser correction for Y00: " << y00 << std::endl;
         return -0.5 - y00 / Y10;
     }
+
     return -0.5;
 }
 
@@ -130,7 +132,7 @@ inline double rkr_procedure::G(double vib) const
     y = y*x + xwe;
     y = y*x + we;
 
-    return y*x + Y00_0;
+    return y*x;
 }
 
 
@@ -388,9 +390,9 @@ inline double rkr_procedure::fFleming(double vib, double Cu, double mu, double v
     //                           AbsTol=abstol, RelTol=1e-6      
     //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS15, w, &result, &local_err);
     //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS31, w, &result, &local_err);
-    //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS61, w, &result, &local_err);
+    gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS61, w, &result, &local_err);
     //printf("vmin=%f, vib=%f, abstol=%e, reltol=%e\n", vmin, vib, abstol, reltol);
-    gsl_integration_qags(&F, vmin, vib, abstol, reltol, limit, w, &result, &local_err);
+    //gsl_integration_qags(&F, vmin, vib, abstol, reltol, limit, w, &result, &local_err);
     double resabs = 0.0;
     double resasc = 0.0;   
     //gsl_integration_qk61(&F,vmin,vib,&result,&local_err,&resabs,&resasc);
@@ -427,8 +429,8 @@ inline double rkr_procedure::gFleming(double vib, double Cu, double mu, double v
                                    //abserr, relerr
     // gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS15, w, &result, &local_err);
     //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS31, w, &result, &local_err);
-    //gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS61, w, &result, &local_err);
-    gsl_integration_qags(&F, vmin, vib, abstol, reltol, limit, w, &result, &local_err);
+    gsl_integration_qag(&F, vmin, vib, abstol, reltol, limit,GSL_INTEG_GAUSS61, w, &result, &local_err);
+    //gsl_integration_qags(&F, vmin, vib, abstol, reltol, limit, w, &result, &local_err);
     double resabs = 0.0;
     double resasc = 0.0;
     //gsl_integration_qk61(&F,vmin,vib,&result,&local_err,&resabs,&resasc);
@@ -464,6 +466,7 @@ inline double rkr_procedure::fKlein(double vib,double Cu,double mu,double vmin,d
     if (err) *err = local_err;
 
     const double factor =std::sqrt(Cu / mu);
+    
 
     return factor * result;
 }

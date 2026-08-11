@@ -473,38 +473,38 @@ public:
         auto* gvScroll = new wxScrolledWindow(panel, wxID_ANY, wxDefaultPosition, wxSize(-1, 220), wxVSCROLL);
         gvScroll->SetScrollRate(5, 5);
         auto* gvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑ "),      gv.we,    351.43,    0.01, 18,
-             wxString::FromUTF8("Fundamental vibration constant ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑxₑ "),   gv.xwe,   2.61,      0.001, 18,
-             wxString::FromUTF8("First anharmonicity constant xₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑyₑ "),   gv.ywe,   0.00295,   0.001, 18,
-             wxString::FromUTF8("Second anharmonicity constant yₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑzₑ "),   gv.zwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Third anharmonicity constant zₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑaₑ "),   gv.awe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient aₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑbₑ "),   gv.bwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient bₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑcₑ "),   gv.cwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient cₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑdₑ "),   gv.dwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑeₑ "),   gv.ewe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑfₑ "),   gv.fwe,   0.0,       0.001, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑgₑ "),   gv.gwe,   0.0,       1e-30, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient gₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑhₑ "),   gv.hwe,   0.0,       1e-30, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient dₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑiₑ "),   gv.iwe,   0.0,       1e-30, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient eₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑjₑ "),   gv.jwe,   0.0,       1e-30, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient fₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑkₑ "),   gv.kwe,   0.0,       1e-30, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient kₑ for ωₑ."), true);
-        addField(gvGrid, gvScroll, wxString::FromUTF8("ωₑlₑ "),   gv.lwe,   0.0,       1e-30, 18,
-             wxString::FromUTF8("Higher-order Dunham coefficient lₑ for ωₑ."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁,₀ "),      gv.we,    351.43,    0.01, 18,
+             wxString::FromUTF8("Fundamental vibration constant Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₂,₀ "),   gv.xwe,   2.61,      0.001, 18,
+             wxString::FromUTF8("First anharmonicity constant Y₂,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₃,₀ "),   gv.ywe,   0.00295,   0.001, 18,
+             wxString::FromUTF8("Second anharmonicity constant Y₃,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₄,₀ "),   gv.zwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Third anharmonicity constant Y₄,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₅,₀ "),   gv.awe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₅,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₆,₀ "),   gv.bwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₆,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₇,₀ "),   gv.cwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₇,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₈,₀ "),   gv.dwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₈,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₉,₀ "),   gv.ewe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₉,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁₀,₀ "),   gv.fwe,   0.0,       0.001, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₁₀,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁₁,₀ "),   gv.gwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₁₁,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁₂,₀ "),   gv.hwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₁₂,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁₃,₀ "),   gv.iwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₁₃,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁₄,₀ "),   gv.jwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₁₄,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁₅,₀ "),   gv.kwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₁₅,₀ for Y₁,₀."), true);
+        addField(gvGrid, gvScroll, wxString::FromUTF8("Y₁₆,₀ "),   gv.lwe,   0.0,       1e-30, 18,
+             wxString::FromUTF8("Higher-order Dunham coefficient Y₁₆,₀ for Y₁,₀."), true);
 
         gvGrid->AddGrowableCol(1, 1);
         gvScroll->SetSizer(gvGrid);
@@ -518,38 +518,38 @@ public:
         auto* bvScroll = new wxScrolledWindow(panel, wxID_ANY, wxDefaultPosition, wxSize(-1, 160), wxVSCROLL);
         bvScroll->SetScrollRate(5, 5);
         auto* bvGrid  = new wxFlexGridSizer(0, 2, 6, 8);
-        addField(bvGrid, bvScroll, wxString::FromUTF8("Bₑ "),   bv.Be,  0.67264,  0.001, 18,
-             wxString::FromUTF8("Equilibrium rotational constant Bₑ."), true);
-        addField(bvGrid, bvScroll, wxString::FromUTF8("αₑ "),   bv.ae,  0.00704,  0.001, 18,
-             wxString::FromUTF8("Vibration-rotation interaction constant αₑ."), true);
-        addField(bvGrid, bvScroll, wxString::FromUTF8("γₑ "),   bv.ye, -0.00004,  0.00001, 18,
-             wxString::FromUTF8("Dunham rotational coefficient γₑ."), true);
-        addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁ₑ "),  bv._1e, 0.0,      0.001, 18,
-             wxString::FromUTF8("First higher-order rotational coefficient γ₁ₑ."), true);
-        addField(bvGrid, bvScroll, wxString::FromUTF8("γ₂ₑ "),  bv._2e, 0.0,      0.001, 18,
-             wxString::FromUTF8("Second higher-order rotational coefficient γ₂ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₃ₑ "),  bv._3e, 0.0,      1e-30, 18,
-               wxString::FromUTF8("Third higher-order rotational coefficient γ₃ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₄ₑ "),  bv._4e, 0.0,      1e-30, 18,
-               wxString::FromUTF8("Fourth higher-order rotational coefficient γ₄ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₅ₑ "),  bv._5e, 0.0,      1e-30, 18,
-               wxString::FromUTF8("Fifth higher-order rotational coefficient γ₅ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₆ₑ "),  bv._6e, 0.0,      1e-30, 18,
-               wxString::FromUTF8("Sixth higher-order rotational coefficient γ₆ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₇ₑ "),  bv._7e, 0.0,      1e-30, 18,
-               wxString::FromUTF8("Seventh higher-order rotational coefficient γ₇ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₈ₑ "),  bv._8e, 0.0,      1e-30, 18,
-               wxString::FromUTF8("Eighth higher-order rotational coefficient γ₈ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₉ₑ "),  bv._9e, 0.0,      1e-30, 18,
-               wxString::FromUTF8("Ninth higher-order rotational coefficient γ₉ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₀ₑ"),  bv._10e, 0.0,     1e-30, 18,
-               wxString::FromUTF8("Tenth higher-order rotational coefficient γ₁₀ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₁ₑ"),  bv._11e, 0.0,     1e-30, 18,
-               wxString::FromUTF8("Eleventh higher-order rotational coefficient γ₁₁ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₂ₑ"),  bv._12e, 0.0,     1e-30, 18,
-               wxString::FromUTF8("Twelfth higher-order rotational coefficient γ₁₂ₑ."), true);
-           addField(bvGrid, bvScroll, wxString::FromUTF8("γ₁₃ₑ"),  bv._13e, 0.0,     1e-30, 18,
-               wxString::FromUTF8("Thirteenth higher-order rotational coefficient γ₁₃ₑ."), true);
+        addField(bvGrid, bvScroll, wxString::FromUTF8("Y₀,₁ " ),   bv.Be,  0.67264,  0.001, 18,
+             wxString::FromUTF8("Equilibrium rotational constant Y₀,₁."), true);
+        addField(bvGrid, bvScroll, wxString::FromUTF8("Y₁,₁ " ),   bv.ae,  0.00704,  0.001, 18,
+             wxString::FromUTF8("Vibration-rotation interaction constant Y₁,₁."), true);
+        addField(bvGrid, bvScroll, wxString::FromUTF8("Y₂,₁ " ),   bv.ye, -0.00004,  0.00001, 18,
+             wxString::FromUTF8("Dunham rotational coefficient Y₂,₁."), true);
+        addField(bvGrid, bvScroll, wxString::FromUTF8("Y₃,₁ " ),  bv._1e, 0.0,      0.001, 18,
+             wxString::FromUTF8("First higher-order rotational coefficient Y₃,₁."), true);
+        addField(bvGrid, bvScroll, wxString::FromUTF8("Y₄,₁ " ),  bv._2e, 0.0,      0.001, 18,
+             wxString::FromUTF8("Second higher-order rotational coefficient Y₄,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₅,₁ " ),  bv._3e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Third higher-order rotational coefficient Y₅,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₆,₁ " ),  bv._4e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Fourth higher-order rotational coefficient Y₆,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₇,₁ " ),  bv._5e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Fifth higher-order rotational coefficient Y₇,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₈,₁ " ),  bv._6e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Sixth higher-order rotational coefficient Y₈,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₉,₁ " ),  bv._7e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Seventh higher-order rotational coefficient Y₉,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₁₀,₁ " ),  bv._8e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Eighth higher-order rotational coefficient Y₁₀,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₁₁,₁ " ),  bv._9e, 0.0,      1e-30, 18,
+               wxString::FromUTF8("Ninth higher-order rotational coefficient Y₁₁,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₁₂,₁ " ),  bv._10e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Tenth higher-order rotational coefficient Y₁₂,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₁₃,₁ " ),  bv._11e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Eleventh higher-order rotational coefficient Y₁₃,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₁₄,₁ " ),  bv._12e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Twelfth higher-order rotational coefficient Y₁₄,₁."), true);
+           addField(bvGrid, bvScroll, wxString::FromUTF8("Y₁₅,₁ " ),  bv._13e, 0.0,     1e-30, 18,
+               wxString::FromUTF8("Thirteenth higher-order rotational coefficient Y₁₅,₁."), true);
         bvGrid->AddGrowableCol(1, 1);
         bvScroll->SetSizer(bvGrid);
         bvScroll->FitInside();
@@ -849,11 +849,11 @@ private:
         for(int i = 0; i < 100; i++)
         {
             
-            printf("Step %d: %f\n", i, steps[i]);
+            //printf("Step %d: %f\n", i, steps[i]);
         }
 
         gsl_set_error_handler_off();        
-        for(int i = 0; i < 100; i++) {  
+        for(int i = 0; i < 1; i++) {  
             // Read all parameters once from the input text
         if (!ReadConstantsFromText("I2B.dat", p))
         {
