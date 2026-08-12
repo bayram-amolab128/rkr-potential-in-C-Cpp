@@ -75,7 +75,7 @@ RKRContext CreateRKRContext(const AllParams& p, CalcParam &cp)
 
 
 ////calculates raw RKR data (V,r) without worrying about unphysical behaviour in the inner wall.
-void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
+void calc_rawRKR(std::vector<double> &V, std::vector<double>& r, std::vector<double>* v_v, std::vector<double>* r_v, std::vector<double>* V_v,
           const AllParams& p, CalcParam &cp, RKRContext &rkr)
 {
     //don't abort the program if error is received.
@@ -174,6 +174,8 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r,
 
             const double v_ex = 0.65 * v;        //go down to 65% of suspect v to avoid curvature.
             const double v_ex_level = std::round(v_ex);
+
+            std::cout<<"v_ex "<<" "<<v_ex<<" v_ex_level "<<v_ex_level<<std::endl;
 
             fF = rkr.ve.f(useFleming,v_ex_level, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
             gF = rkr.ve.g(useFleming,v_ex_level, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errgF,w);
@@ -371,11 +373,12 @@ bool detectOutwardCurvature(const std::vector<double>& V,
             cp.V_s=V1;
             cp.i_s=i;  
             cp.v_ex = cp.v_s;//if outward curvature detected, v_ex is set to v_s.
-            cp.v_ex_level = std::floor(0.65*cp.v_ex);
+            cp.v_ex_level = std::floor(0.85*cp.v_ex)-1.0; //set v_ex_level to 85% of v_s, minus 1.0 for safety.
 
             ///not necessary to calculate r_ex and V_ex here, as they will be calculated later.
             cp.V_ex = V1; //set at v_ex_level*0.85 later.
             cp.r_ex = r1; //set at v_ex_level*0.85 later.
+            std::cout<<"Outward curvature detected at r = "<<r1<<" v_s = "<<cp.v_s<<" v_s_level = "<<cp.v_s_level<<" V_s = "<<V1<<std::endl;
             return true;  // indicates outward curvature detected, which is unphysical.
         }
 
@@ -429,10 +432,12 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
 
 
     double v_ex = cp.v_ex; 
-    double v_ex_level = static_cast<double> (cp.v_ex_level); 
+    double v_ex_level =static_cast<double> (cp.v_ex_level); 
 
-    double v_init =  std::floor(0.5*v_ex_level);
-    double v_final = std::floor(0.9*v_ex_level);
+    double v_init =  std::floor(0.44*v_ex_level-1.0);
+    double v_final = std::floor(1.0*v_ex_level+1.0);
+    std::cout<<"v_init "<<v_init<<" v_final "<<v_final<<std::endl;
+    
 
     for(double v = v_init; v<=v_final; ++v){
         n=n+1.0;
@@ -465,7 +470,7 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
     //std::cout<<"n_i "<< n_i << " n "<<n<<std::endl;
 
 
-    double v_1 = std::floor(v_ex_level*0.85)-1.0;
+    double v_1 = v_ex_level;//std::floor(v_ex_level*0.85)-1.0;
     // Fleming integrals called from rkr_procedure.h
 
     fF = rkr.ve.f(useFleming,v_1, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
@@ -475,7 +480,7 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
     double V1= rkr.ve.G(v_1) + rkr.Te;
 
 
-    double v_2 = std::floor(v_ex_level*0.85);
+    double v_2 = v_ex_level+1.0;//std::floor(v_ex_level*0.85);
     // Fleming integrals called from rkr_procedure.h
 
     fF = rkr.ve.f(useFleming,v_2, rkr.Cu, rkr.mu, vmin, abserrtol,relerrtol,&errfF,w);
@@ -500,6 +505,8 @@ void estimateInnerWall_params( SplineNaK::Spline &s,
     //also set extraploation r and V
     cp.r_ex = r2;
     cp.V_ex = V2;
+    cp.v_ex = v_2;
+    std::cout<<"r_ex "<<cp.r_ex<<" v_ex "<<cp.v_ex<<std::endl;
     //std::cout<<"r_ex "<<cp.r_ex<<" V_ex "<<cp.V_ex<<std::endl;
 
     gsl_integration_workspace_free(w);
@@ -520,19 +527,20 @@ void construct_ExtraPCurve(RKRContext &rkr, const CalcParam &cp,
     double fF=0.0;
     double gF=0.0;
 
+    std::cout<<"exrtrapolation level: "<<cp.v_ex_level<<std::endl;
     double vmin = cp.vmin;
     double vmax = cp.vmax;
     double v_step = cp.v_step;
     double abserrtol      = cp.abserrtol;    //fixed abs. error tolerance.
     double relerrtol      = cp.relerrtol;    //fixed rel. error
-    double v_start = 0.85*cp.v_ex_level;     //start extrapolation from v_ex_level.
+    double v_start = cp.v_ex_level;     //start extrapolation from v_ex_level.
 
     double n = double(cp.n);
     double A = cp.A;
     double B = cp.B;
 
     //std::cout<<A<<" "<<B<<" "<<n<<std::endl;
-
+    std::cout<<"vstart of extrapolation "<<v_start<<std::endl;
     for (double v = v_start; v <= vmax; v +=v_step) {
         Gv = rkr.ve.G(v) + rkr.Te;
         

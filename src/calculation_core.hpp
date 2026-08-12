@@ -88,7 +88,7 @@ void print_execution_time(auto t1, auto t2);
 
 
 RKRContext CreateRKRContext(const AllParams& p, CalcParam &cp);
-void calc_rawRKR(std::vector<double> &V, std::vector<double>& r, const AllParams& p, CalcParam &cp, RKRContext &rkr);
+void calc_rawRKR(std::vector<double> &V, std::vector<double>& r, std::vector<double>* v_v, std::vector<double>* r_v, std::vector<double>* V_v, const AllParams& p, CalcParam &cp, RKRContext &rkr);
 void determineExtraPIndices(std::vector<double> &V, std::vector<double> &r, CalcParam &cp);
 SplineNaK::Spline SplineFit_to_RKR(std::vector<double>& V, std::vector<double>& r, std::vector<double>& V_spl, std::vector<double>& r_spl, const CalcParam &cp);
 
