@@ -693,8 +693,8 @@ public:
 private:
     struct { NumField we,xwe,ywe,zwe,awe,bwe,cwe,dwe,ewe,fwe, gwe, hwe, iwe, jwe, kwe, lwe; } gv;
     struct { NumField Be,ae,ye,_1e,_2e,_3e,_4e,_5e,_6e,_7e,_8e,_9e,_10e,_11e,_12e,_13e; } bv;
-    struct { NumField m1,m2,space,Vmax, Te; } extras;
-    struct { NumField De, ke; } morse;
+    struct { NumField m1,m2,space,Vmax, Te, NetCharge; } extras;
+    struct { NumField De, ke, Re; } morse;
 
     wxTextCtrl* titleCtrl{};
     wxTextCtrl* output{};
@@ -808,6 +808,7 @@ private:
         p.ex.m1 = val(extras.m1);
         p.ex.m2 = val(extras.m2);
         p.ex.space  = val(extras.space);
+        p.ex.NetCharge =val(extras.NetCharge);
         p.ex.UseKaiser = kaiserCheck->IsChecked() ? 1.0 : 0.0;
 
         p.ex.Vmax   = val(extras.Vmax);
@@ -987,20 +988,20 @@ private:
         std::unordered_map<std::string, wxWindow*> m;
 
         // G(v)
-        m["we"]  = gv.we.editor;   m["xwe"] = gv.xwe.editor;  m["ywe"] = gv.ywe.editor;
-        m["zwe"] = gv.zwe.editor;  m["awe"] = gv.awe.editor;  m["bwe"] = gv.bwe.editor;
-        m["cwe"] = gv.cwe.editor;  m["dwe"] = gv.dwe.editor;  m["ewe"] = gv.ewe.editor;
-        m["fwe"] = gv.fwe.editor;  m["gwe"] = gv.gwe.editor;  m["hwe"] = gv.hwe.editor;
-        m["iwe"] = gv.iwe.editor;  m["jwe"] = gv.jwe.editor;  m["kwe"] = gv.kwe.editor;
-        m["lwe"] = gv.lwe.editor;
+        m["Y1,0"]  = gv.we.editor;   m["Y2,0"] = gv.xwe.editor;  m["Y3,0"] = gv.ywe.editor;
+        m["Y4,0"] = gv.zwe.editor;  m["Y5,0"] = gv.awe.editor;  m["Y6,0"] = gv.bwe.editor;
+        m["Y7,0"] = gv.cwe.editor;  m["Y8,0"] = gv.dwe.editor;  m["Y9,0"] = gv.ewe.editor;
+        m["Y10,0"] = gv.fwe.editor;  m["Y11,0"] = gv.gwe.editor;  m["Y12,0"] = gv.hwe.editor;
+        m["Y13,0"] = gv.iwe.editor;  m["Y14,0"] = gv.jwe.editor;  m["Y15,0"] = gv.kwe.editor;
+        m["Y16,0"] = gv.lwe.editor;
 
         // B(v)
-        m["Be"]  = bv.Be.editor;   m["ae"]  = bv.ae.editor;   m["ye"]  = bv.ye.editor;
-        m["_1e"] = bv._1e.editor;  m["_2e"] = bv._2e.editor;
-        m["_3e"] = bv._3e.editor;  m["_4e"] = bv._4e.editor;  m["_5e"] = bv._5e.editor;
-        m["_6e"] = bv._6e.editor;  m["_7e"] = bv._7e.editor;  m["_8e"] = bv._8e.editor;
-        m["_9e"] = bv._9e.editor;  m["_10e"] = bv._10e.editor; m["_11e"] = bv._11e.editor;
-        m["_12e"] = bv._12e.editor; m["_13e"] = bv._13e.editor;
+        m["Y0,1"]  = bv.Be.editor;   m["Y1,1"]  = bv.ae.editor;   m["Y2,1"]  = bv.ye.editor;
+        m["Y3,1"] = bv._1e.editor;  m["Y4,1"] = bv._2e.editor;
+        m["Y5,1"] = bv._3e.editor;  m["Y6,1"] = bv._4e.editor;  m["Y7,1"] = bv._5e.editor;
+        m["Y8,1"] = bv._6e.editor;  m["Y9,1"] = bv._7e.editor;  m["Y10,1"] = bv._8e.editor;
+        m["Y11,1"] = bv._9e.editor;  m["Y12,1"] = bv._10e.editor; m["Y13,1"] = bv._11e.editor;
+        m["Y14,1"] = bv._12e.editor; m["Y15,1"] = bv._13e.editor;
 
         // Extras
         m["m1"]    = extras.m1.editor;
@@ -1009,6 +1010,7 @@ private:
         ///m["kaiser"]= extras.kaiser.editor;
         m["Vmax"]  = extras.Vmax.editor;
         m["space"] = extras.space.editor;
+        m["NetCharge"] = extras.NetCharge.editor;
 
         // Morse
         m["De"]    = morse.De.editor;

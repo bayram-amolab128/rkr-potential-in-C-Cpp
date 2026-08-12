@@ -52,8 +52,8 @@ RKRContext CreateRKRContext(const AllParams& p, CalcParam &cp)
     };
 
     rkr.Cu = 16.857629206;
-    rkr.me = 0.000548579909;
-    rkr.netcharge = 0.0;
+    rkr.me = 0.000548579909;//amu
+    rkr.netcharge = p.ex.NetCharge;
 
     const double m1 = p.ex.m1;
     const double m2 = p.ex.m2;

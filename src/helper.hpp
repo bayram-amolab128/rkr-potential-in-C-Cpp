@@ -19,7 +19,7 @@
 #include <limits>
 
 
-
+//these spectroscopic constants are actually Dunham coefficients.. should rename it to DunhamCoeffs later.
 struct GvParams
 {
     double we{0.0};
@@ -61,7 +61,7 @@ struct BvParams
 };
 
 struct ExtraParams {
-    double m1{}, m2{}, space{},ladderspace{}, Te{}, De{}, ke{}, Re{}, Vmax{}, UseKaiser{};
+    double m1{}, m2{}, space{},ladderspace{}, Te{}, De{}, ke{}, Re{}, Vmax{}, UseKaiser{}, NetCharge{};
 };
 
 struct GvParams_nde {
@@ -165,46 +165,47 @@ inline bool ReadConstantsFromStream(std::istream& in, AllParams& p)
             }
 
             // G(v)
-            else if (key == "we")  p.gv.we  = std::stod(val);
-            else if (key == "xwe") p.gv.xwe = std::stod(val);
-            else if (key == "ywe") p.gv.ywe = std::stod(val);
-            else if (key == "zwe") p.gv.zwe = std::stod(val);
-            else if (key == "awe") p.gv.awe = std::stod(val);
-            else if (key == "bwe") p.gv.bwe = std::stod(val);
-            else if (key == "cwe") p.gv.cwe = std::stod(val);
-            else if (key == "dwe") p.gv.dwe = std::stod(val);
-            else if (key == "ewe") p.gv.ewe = std::stod(val);
-            else if (key == "fwe") p.gv.fwe = std::stod(val);
-            else if (key == "gwe") p.gv.gwe = std::stod(val);
-            else if (key == "hwe") p.gv.hwe = std::stod(val);
-            else if (key == "iwe") p.gv.iwe = std::stod(val);
-            else if (key == "jwe") p.gv.jwe = std::stod(val);
-            else if (key == "kwe") p.gv.kwe = std::stod(val);
-            else if (key == "lwe") p.gv.lwe = std::stod(val);
+            else if (key == "Y1,0")  p.gv.we  = std::stod(val);
+            else if (key == "Y2,0") p.gv.xwe = std::stod(val);
+            else if (key == "Y3,0") p.gv.ywe = std::stod(val);
+            else if (key == "Y4,0") p.gv.zwe = std::stod(val);
+            else if (key == "Y5,0") p.gv.awe = std::stod(val);
+            else if (key == "Y6,0") p.gv.bwe = std::stod(val);
+            else if (key == "Y7,0") p.gv.cwe = std::stod(val);
+            else if (key == "Y8,0") p.gv.dwe = std::stod(val);
+            else if (key == "Y9,0") p.gv.ewe = std::stod(val);
+            else if (key == "Y10,0") p.gv.fwe = std::stod(val);
+            else if (key == "Y11,0") p.gv.gwe = std::stod(val);
+            else if (key == "Y12,0") p.gv.hwe = std::stod(val);
+            else if (key == "Y13,0") p.gv.iwe = std::stod(val);
+            else if (key == "Y14,0") p.gv.jwe = std::stod(val);
+            else if (key == "Y15,0") p.gv.kwe = std::stod(val);
+            else if (key == "Y16,0") p.gv.lwe = std::stod(val);
 
             // B(v)
-            else if (key == "Be")  p.bv.Be  = std::stod(val);
-            else if (key == "ae")  p.bv.ae  = std::stod(val);
-            else if (key == "ye")  p.bv.ye  = std::stod(val);
-            else if (key == "_1e") p.bv._1e = std::stod(val);
-            else if (key == "_2e") p.bv._2e = std::stod(val);
-            else if (key == "_3e") p.bv._3e = std::stod(val);
-            else if (key == "_4e") p.bv._4e = std::stod(val);
-            else if (key == "_5e") p.bv._5e = std::stod(val);
-            else if (key == "_6e") p.bv._6e = std::stod(val);
-            else if (key == "_7e") p.bv._7e = std::stod(val);
-            else if (key == "_8e") p.bv._8e = std::stod(val);
-            else if (key == "_9e") p.bv._9e = std::stod(val);
-            else if (key == "_10e") p.bv._10e = std::stod(val);
-            else if (key == "_11e") p.bv._11e = std::stod(val);
-            else if (key == "_12e") p.bv._12e = std::stod(val);
-            else if (key == "_13e") p.bv._13e = std::stod(val);
+            else if (key == "Y0,1")  p.bv.Be  = std::stod(val);
+            else if (key == "Y1,1")  p.bv.ae  = std::stod(val);
+            else if (key == "Y2,1")  p.bv.ye  = std::stod(val);
+            else if (key == "Y3,1") p.bv._1e = std::stod(val);
+            else if (key == "Y4,1") p.bv._2e = std::stod(val);
+            else if (key == "Y5,1") p.bv._3e = std::stod(val);
+            else if (key == "Y6,1") p.bv._4e = std::stod(val);
+            else if (key == "Y7,1") p.bv._5e = std::stod(val);
+            else if (key == "Y8,1") p.bv._6e = std::stod(val);
+            else if (key == "Y9,1") p.bv._7e = std::stod(val);
+            else if (key == "Y10,1") p.bv._8e = std::stod(val);
+            else if (key == "Y11,1") p.bv._9e = std::stod(val);
+            else if (key == "Y12,1") p.bv._10e = std::stod(val);
+            else if (key == "Y13,1") p.bv._11e = std::stod(val);
+            else if (key == "Y14,1") p.bv._12e = std::stod(val);
+            else if (key == "Y15,1") p.bv._13e = std::stod(val);
 
             // Extra
             else if (key == "m1") p.ex.m1 = std::stod(val);
             else if (key == "m2") p.ex.m2 = std::stod(val);
             //else if (key == "netcharge") p.ex.netcharge = std::stod(val);
             else if (key == "space") p.ex.space = std::stod(val);
+            else if (key == "net charge") p.ex.NetCharge = std::stod(val);
             else if (key == "ladderspace") p.ex.ladderspace = std::stod(val);
             else if (key == "Vmax") p.ex.Vmax = std::stod(val);
             //else if (key == "errortol") p.ex.errortol = std::stod(val);
