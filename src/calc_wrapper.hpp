@@ -22,7 +22,7 @@
 #include "helper.hpp"
 //#include "morse_fitting.hpp"
 
-inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vector<double>& V_v, std::vector<double>& r_v, std::vector<double> &v, const AllParams& p, CalcParam &cp) {
+inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vector<double>& V_v, std::vector<double>& r_v, std::vector<double> &v, AllParams& p, CalcParam &cp) {
 
     
    //create the output folder for all outputs.
@@ -63,7 +63,7 @@ inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vec
     
     calc_rawRKR(V_raw, r_raw,nullptr,nullptr, nullptr, p, cp, rkr);
 
-    setEquilibriumPoint(V_raw, r_raw, cp);
+    setEquilibriumPoint(V_raw, r_raw, cp, p);
 
     if(!cp.detectInwardCurv){
         cp.detectOutwardCurv= detectOutwardCurvature(V_raw, r_raw,  cp);
@@ -77,11 +77,37 @@ inline int calc_wrapper(std::vector<double>& V, std::vector<double>& r, std::vec
 
     combine_inner_outer_rkr(V_i, r_i, V_o, r_o, V_raw, r_raw, V, r, cp);
 
+
     //need to add the discrete energy levels to the output later.
     std::cout<<"v_min = "<<cp.vmin<<", v_max = "<<cp.vmax<<", v_step = "<<cp.v_step<<std::endl;
     std::cout<<"v_ex_level = "<<cp.v_ex_level<<std::endl;
     std::cout<<cp<<std::endl;
     return 0;
 
+}
+
+inline int calc_morseV(std::vector<double>& V, std::vector<double>& r, AllParams& p) {
+    // Calculate Morse potential values based on the provided parameters
+    double De = p.ex.De; // Dissociation energy
+    double ke = p.ex.ke; // Force constant
+    p.morse.De = De;
+    p.morse.ke = ke;
+    double a = p.morse.a(); // Morse parameter
+    double re = p.morse.Re; // Equilibrium bond length
+
+    std::cout << "Calculating Morse potential with parameters: De = " << De << ", a = " << a << ", re = " << re << std::endl;
+    if (r.empty()) {
+        std::cout << "Error: r vector is empty." << std::endl;
+        return 1;
+    }
+
+    for (size_t i = 0; i < r.size(); ++i) {
+        double r_i = r[i];
+        std::cout << "Calculating Morse potential for r[" << i << "] = " << r_i << std::endl;
+        V.push_back(De * (1 - std::exp(-a * (r_i - re))) * (1 - std::exp(-a * (r_i - re))));
+    }
+    std::cout << "Morse potential calculation completed." << std::endl;
+
+    return 0;
 }
 

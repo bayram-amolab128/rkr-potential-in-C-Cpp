@@ -86,16 +86,6 @@ struct switch_params {
     double ds{1.0};  // switching width
 };
 
-struct AllParams {
-    std::string state_name;
-    GvParams gv;
-    BvParams bv;
-    ExtraParams ex;
-    GvParams_nde gv_nde;
-    BvParams_nde bv_nde;
-    switch_params sw;
-};
-
 struct MorseParams {
     double Te;   // electronic term origin (cm⁻¹)
     double De;   // dissociation energy (cm⁻¹)
@@ -112,6 +102,19 @@ inline double MorseParams::a() const {
         return std::sqrt(ke / (2.0 * De));
     return 0.0;
 }
+
+
+struct AllParams {
+    std::string state_name;
+    GvParams gv;
+    BvParams bv;
+    ExtraParams ex;
+    MorseParams morse;
+    GvParams_nde gv_nde;
+    BvParams_nde bv_nde;
+    switch_params sw;
+};
+
 
 //file reader to collect spectroscopic constants.
 inline std::string trim(std::string s)
@@ -201,11 +204,11 @@ inline bool ReadConstantsFromStream(std::istream& in, AllParams& p)
             else if (key == "Y15,1") p.bv._13e = std::stod(val);
 
             // Extra
-            else if (key == "m1") p.ex.m1 = std::stod(val);
-            else if (key == "m2") p.ex.m2 = std::stod(val);
+            else if (key == "m1" || key =="mass1") p.ex.m1 = std::stod(val);
+            else if (key == "m2" || key == "mass2") p.ex.m2 = std::stod(val);
             //else if (key == "netcharge") p.ex.netcharge = std::stod(val);
-            else if (key == "space") p.ex.space = std::stod(val);
-            else if (key == "net charge") p.ex.NetCharge = std::stod(val);
+            else if (key == "step size" || key == "space") p.ex.space = std::stod(val);
+            else if (key == "net charge" || key == "NetCharge" || key == "netcharge") p.ex.NetCharge = std::stod(val);
             else if (key == "ladderspace") p.ex.ladderspace = std::stod(val);
             else if (key == "Vmax") p.ex.Vmax = std::stod(val);
             //else if (key == "errortol") p.ex.errortol = std::stod(val);

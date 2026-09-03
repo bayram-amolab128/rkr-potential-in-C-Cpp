@@ -95,7 +95,7 @@ SplineNaK::Spline SplineFit_to_RKR(std::vector<double>& V, std::vector<double>& 
 void estimateInnerWall_params( SplineNaK::Spline &s, const std::vector<double>& raw_V,const std::vector<double>& raw_r,CalcParam &cp, RKRContext &rkr);
 
 bool detectOutwardCurvature(const std::vector<double>&V, const std::vector<double>&r,  CalcParam &cp);
-void setEquilibriumPoint( std::vector<double>& V,  std::vector<double>& r, CalcParam &cp);
+void setEquilibriumPoint( std::vector<double>& V,  std::vector<double>& r, CalcParam &cp, AllParams &p);
 void construct_ExtraPCurve(RKRContext &rkr, const CalcParam &cp,
                          std::vector<double>& V_inner, std::vector<double>& r_inner,
                          std::vector<double>& V_outer, std::vector<double>& r_outer);

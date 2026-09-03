@@ -237,7 +237,7 @@ void calc_rawRKR(std::vector<double> &V, std::vector<double>& r, std::vector<dou
     gsl_integration_workspace_free(w);
 }//end of calc.
 
-void setEquilibriumPoint( std::vector<double>& V,  std::vector<double>& r, CalcParam &cp)
+void setEquilibriumPoint( std::vector<double>& V,  std::vector<double>& r, CalcParam &cp, AllParams &p)
 {
     if (V.size() != r.size()) {
         throw std::runtime_error("determineEquilibriumParameters: V and r must have the same size.");
@@ -254,6 +254,10 @@ void setEquilibriumPoint( std::vector<double>& V,  std::vector<double>& r, CalcP
     //cp.V_re previously stored, Te. 
     V.push_back(cp.V_re);
     r.push_back(cp.re);
+
+    // copy re to morse parameters
+    p.morse.Re = cp.re;
+
 
     SortPaired(V, r); // Ensure V and r are sorted after adding the equilibrium point.
 

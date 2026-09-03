@@ -18,6 +18,7 @@
 // ---- External data (filled by your calc) ----
 std::vector<double> r;    // X values
 std::vector<double> E;    // Y values
+std::vector<double> VMorse; // Morse potential values
 
 std::vector<double> r_v;  // X values
 std::vector<double> E_v;  // Y values
@@ -667,7 +668,7 @@ public:
 
         // Right column title
         auto* titleText = new wxStaticText(
-            panel, wxID_ANY, "Energy Levels vs. Intermolecular Distance");
+            panel, wxID_ANY, "Potential Energy vs. Intermolecular Distance");
         titleText->SetFont(wxFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
         titleText->SetForegroundColour(*wxBLACK);
 
@@ -818,6 +819,10 @@ private:
         // Morse (overlay) params
         p.ex.De = val(morse.De, 0.0);
         p.ex.ke = val(morse.ke, 0.0);
+        p.morse.Te = p.ex.Te;
+        p.morse.De = p.ex.De;
+        p.morse.ke = p.ex.ke;
+        //p.morse.Re is copied from cp.re after calc_wrapper(..) is called.;
 
         std::ofstream timing_file("cpp_timing_all.txt");
 
@@ -873,6 +878,7 @@ private:
         auto start = std::chrono::steady_clock::now();
         
         calc_wrapper(E, r, E_v, r_v, v, p, cp);   //calculates E and r values;
+        calc_morseV(VMorse, r, p);
         
 
         //auto end   = std::chrono::high_resolution_clock::now();
@@ -920,17 +926,81 @@ private:
         //for (size_t i = 0; i < r_v.size(); ++i) {
            // output->AppendText(wxString::Format("v=%.1f  E=%.3f 1/cm\n", r_v[i], E_v[i]));
         //}
-
-        WriteRGToFile("./output/Evsr_discrete.dat", r_v, E_v);
-        output->AppendText(wxString::Format("Evsr_discrete.dat output file is updated with discrete energy levels.\n"));
+        
+        PrintCalcParam(cp);
+        //WriteRGToFile("./output/Evsr_discrete.dat", r_v, E_v);
+        //output->AppendText(wxString::Format("Evsr_discrete.dat output file is updated with discrete energy levels.\n"));
 
     }
+
+    void PrintCalcParam(const CalcParam& p)
+    {
+        output->AppendText(wxString::Format("Calculation parameters and results:\n"));
+
+        output->AppendText(wxString::Format("\n--- Inner-wall suspect ---\n"));
+
+        //output->AppendText(wxString::Format("i_s       : %lld\n",static_cast<long long>(p.i_s)));
+        output->AppendText(wxString::Format("v_s      : %.16f\n", p.v_s));
+        output->AppendText(wxString::Format("r_s      : %.16f\n", p.r_s));
+
+        output->AppendText(wxString::Format("V(r_s)   : %.16f\n", p.V_s));
+
+
+
+        //output->AppendText(wxString::Format("v_s_level : %lld\n",static_cast<long long>(p.v_s_level)));
+
+
+        output->AppendText(wxString::Format("\n--- RKR parameters ---\n"));
+
+        output->AppendText(wxString::Format("vmin     : %.16f\n", p.vmin));
+
+        output->AppendText(wxString::Format("vmax     : %.16f\n", p.vmax));
+
+        output->AppendText(wxString::Format("v_step   : %.16f\n", p.v_step));
+
+
+        output->AppendText(wxString::Format("\n--- Well minimum ---\n"));
+
+        output->AppendText(wxString::Format("re       : %.16f\n", p.re));
+        output->AppendText(wxString::Format("V(re)    : %.16f\n", p.V_re));
+
+        
+
+        //output->AppendText(wxString::Format("i_re      : %lld\n",static_cast<long long>(p.i_re)));
+
+
+        output->AppendText(wxString::Format("\n--- Inverse-power extrapolation ---\n"));
+
+        output->AppendText(wxString::Format("A       : %.20e\n", p.A));
+
+        output->AppendText(wxString::Format("B       : %.20e\n", p.B));
+
+        output->AppendText(wxString::Format("n       : %.16f\n", p.n));
+
+        output->AppendText(wxString::Format("v_ex    : %.16f\n", p.v_ex));
+
+        output->AppendText(wxString::Format("r_ex    : %.16f\n", p.r_ex));
+        output->AppendText(wxString::Format("V(r_ex) : %.16f\n", p.V_ex));
+
+        //output->AppendText(wxString::Format("v_ex_level : %lld\n",static_cast<long long>(p.v_ex_level)));
+
+      
+
+        //output->AppendText(wxString::Format("i_ex_inner : %lld\n",static_cast<long long>(p.i_ex_inner)));
+
+        //output->AppendText(wxString::Format("i_ex_outer : %lld\n",static_cast<long long>(p.i_ex_outer)));
+
+        output->AppendText(wxString::Format("===============================\n"));
+    }
+
 
     void OnToggleMorse(wxCommandEvent&) {
-        BuildOrClearMorseOverlay();
+        std::cout << "Morse overlay toggled: " << (showMorse->GetValue() ? "ON" : "OFF") << std::endl;
+        BuildOrClearMorseOverlay(VMorse, r);
+        std::cout << "Morse overlay updated." << std::endl;
     }
 
-    void BuildOrClearMorseOverlay() {
+    void BuildOrClearMorseOverlay(const std::vector<double>& Vmorse, const std::vector<double>& r) {
         if (!showMorse->GetValue()) {
             plot->SetOverlayVisible(false);
             plot->SetOverlayXY({}, {});
@@ -956,13 +1026,8 @@ private:
         double rmin = *xminIt, rmax = *xmaxIt;
         if (rmax <= rmin) { rmax = rmin + 1.0; }
 
-        // Make a smooth 1000-point curve
-        std::vector<double> rM, VM;
-        const double N = 1000.0;
-        const double dr = (rmax - rmin) / (N - 1.0);
-        makeMorseCurve(mp, rmin, rmax, dr, rM, VM);
-
-        plot->SetOverlayXY(rM, VM);
+    
+        plot->SetOverlayXY(r, Vmorse);
         plot->SetOverlayVisible(true);
     }
 
@@ -1009,8 +1074,8 @@ private:
         m["Te"]    = extras.Te.editor;
         ///m["kaiser"]= extras.kaiser.editor;
         m["Vmax"]  = extras.Vmax.editor;
-        m["space"] = extras.space.editor;
-        m["NetCharge"] = extras.NetCharge.editor;
+        m["step size"] = extras.space.editor;
+        m["net charge"] = extras.NetCharge.editor;
 
         // Morse
         m["De"]    = morse.De.editor;

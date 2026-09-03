@@ -1,14 +1,11 @@
-name = I2
-state = B
+name = I_2
+state = BtPi_u
 kaiser = 0
-intmethod = Fleming
 Vmax = 82
-space = 0.1
-ladderspace = 3
-errortol = 1e-10
+step size = 0.1
 m1 = 126.904472
 m2 = 126.904472
-netcharge = 0
+net charge = 0
 
 Y1,0 = 1.256643430002e+2
 Y2,0 = -7.475284960242e-1
@@ -47,4 +44,4 @@ Y15,1   = 9.047632057664e-28
 Te = 0
 De = 0
 ke = 0
-re = 0
+
