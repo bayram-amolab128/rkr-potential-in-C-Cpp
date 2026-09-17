@@ -61,8 +61,8 @@ RKRContext CreateRKRContext(const AllParams& p, CalcParam &cp)
     rkr.mu = (m1 * m2) / (m1 + m2 - rkr.netcharge * rkr.me);
     rkr.Te = p.ex.Te;
 
-    //const double vmax_trunc = rkr.ve.checkAndTruncateVmax();
-    const double vmax = p.ex.Vmax;//std::min(p.ex.Vmax, vmax_trunc);
+    const double vmax_trunc = rkr.ve.checkAndTruncateVmax();
+    const double vmax = std::min(p.ex.Vmax, vmax_trunc);
     const double vmin = rkr.ve.kaiser_correction_vmin();
 
     cp.v_step = p.ex.space;
