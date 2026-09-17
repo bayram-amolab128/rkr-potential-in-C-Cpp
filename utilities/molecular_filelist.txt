@@ -1,0 +1,6 @@
+# One molecular-data input file per line.
+# Relative paths are resolved relative to this file.
+
+..\I2B.dat
+..\Li2_X.dat
+..\Li2_A.dat
